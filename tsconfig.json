@@ -1,0 +1,16 @@
+{
+  "compilerOptions": 
+    {
+      "target": "ES2015",
+      "module": "none",
+      "outDir": "dist",
+      "rootDir": "src",
+      "removeComments": true,
+      "strict": true,
+      "noImplicitAny": true,
+      "strictNullChecks": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true
+    },
+}
