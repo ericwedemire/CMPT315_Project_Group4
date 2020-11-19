@@ -12,7 +12,6 @@ import (
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/mux"
-	_ "github.com/lib/pq"
 )
 
 // constants for DB connection
@@ -34,7 +33,7 @@ const FULLHOST = WEBHOST + ":" + WEBPORT
 var database *redis.Client
 
 // main spins up the mux router, database connection, defines the handler
-// fucntions, logging middleware, and finally the server
+// functions, logging middleware, and finally the server
 func main() {
 	//using gorilla mux
 	router := mux.NewRouter()
