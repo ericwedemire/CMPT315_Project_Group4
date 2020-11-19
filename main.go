@@ -44,9 +44,13 @@ func main() {
 	defer database.Close()
 
 	//API Handlers ------------------------------------------------------------
-	// Loads offset-limit number of posts sorted by date
-	router.HandleFunc("/api/v1/posts", createGame).
-		Queries("offset", "{offset:[0-9]+}", "limit", "{limit:[0-9]+}").
+	// Creates new game by setting up websocket
+	router.HandleFunc("/api/v1/games", createGame).
+		Methods(http.MethodPost)
+
+	// Subcribes new player to game WebSocket
+	router.HandleFunc("/api/v1/games", newSocketConnection).
+		Queries("gameID", "{gameID:[0-9]+}").
 		Methods(http.MethodPost)
 
 	// Default
@@ -54,6 +58,8 @@ func main() {
 	//-------------------------------------------------------------------------
 
 	//Non-API Handlers --------------------------------------------------------
+	router.HandleFunc("/socket", newSocketConnection).
+		Methods(http.MethodGet)
 
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./dist/")))
 	//-------------------------------------------------------------------------
