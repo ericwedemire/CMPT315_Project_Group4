@@ -1,3 +1,9 @@
+/*
+ * Shea Odland, Von Castro, Eric Wedemire
+ * CMPT315
+ * Group Project: Codenames
+ */
+
 {
   "compilerOptions": {
     "target": "ES2015",
