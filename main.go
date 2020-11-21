@@ -10,27 +10,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/mux"
 )
-
-// constants for DB connection
-const (
-	DBHOST = "localhost"
-	DBPORT = "6379"
-)
-
-// constants for web hosting
-const (
-	WEBHOST = "localhost"
-	WEBPORT = "8008"
-)
-
-// FULLHOST const for ease of use when using full URI path
-const FULLHOST = WEBHOST + ":" + WEBPORT
-
-//package-private access to database connection
-var database *redis.Client
 
 // main spins up the mux router, database connection, defines the handler
 // functions, logging middleware, and finally the server
@@ -48,17 +29,13 @@ func main() {
 	router.HandleFunc("/api/v1/games", createGame).
 		Methods(http.MethodPost)
 
-	// Subcribes new player to game WebSocket
-	router.HandleFunc("/api/v1/games", newSocketConnection).
-		Queries("gameID", "{gameID:[0-9]+}").
-		Methods(http.MethodPost)
-
 	// Default
 	router.HandleFunc("/api/v1/", defaultHandle)
 	//-------------------------------------------------------------------------
 
 	//Non-API Handlers --------------------------------------------------------
 	router.HandleFunc("/socket", newSocketConnection).
+		Queries("gameID", "{gameID:[a-zA-Z0-9]+}").
 		Methods(http.MethodGet)
 
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./dist/")))
