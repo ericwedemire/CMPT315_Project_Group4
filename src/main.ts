@@ -102,17 +102,18 @@ function checkCard(event: MouseEvent) {
         // let's just say the innerHTML can either be "blue" or "red"
         gameTurn = query.innerHTML;
         // card cannot have been already picked
-        if (word.contains("unselected")) {
+        if (!word.contains("selected")) {
             // flag that card has been picked
-            word.replace("unselected", "selected");
+            // <div class="wordCard"> => <div class="wordCard selected">
+            word.add("selected");
             if (word.contains("assassin")) {
-                // end game
+                // TODO: end game
             } else if (!word.contains(gameTurn)) {
-                // terrible but temporary
+                // switch turn if wrong card chosen
                 if (gameTurn == "red") {
-                    query.innerHTML = "blue"
+                    query.innerHTML = "blue";
                 } else {
-                    query.innerHTML = "red"
+                    query.innerHTML = "red";
                 }
             }
         }
@@ -120,17 +121,57 @@ function checkCard(event: MouseEvent) {
     return 0;
 }
 
+function spyMasterView() {
+    // TODO: Remove "End player turn" button?
+    let cards = document.querySelectorAll(".wordCards");
+    cards.forEach(function (card) {
+        let cardClasses = card.classList;
+        console.log(cardClasses);
+        card.setAttribute("font-weight", "bold");
+        if (cardClasses[1] && cardClasses[1] != "assassin") {
+            if (cardClasses[1] != "assassin") {
+                card.setAttribute("color", cardClasses[1]);
+            } else {
+                card.setAttribute("color", "white");
+                card.setAttribute("background-colour", "black");
+            }
+        }
+    });
+}
+
+function playerView() {
+    // TODO: Reactivate "End player turn" button?
+    let cards = document.querySelectorAll(".wordCards");
+    cards.forEach(function (card) {
+        let cardClasses = card.classList;
+        console.log(cardClasses);
+        card.removeAttribute("font-weight");
+        card.setAttribute("background-colour", "grey");
+        if (cardClasses.contains("assassin")) {
+            card.setAttribute("color", "black");
+        }
+    });
+}
+
 
 function attachListeners() {
     const goBtn: HTMLInputElement | null = document.querySelector("#btn-go");
     if (goBtn) {
-        goBtn.addEventListener("click", createGame)
-    }
+        goBtn.addEventListener("click", createGame);
+    };
     let wordCards = document.querySelectorAll(".wordCard");
     wordCards.forEach(function (wordCard) {
         let element = <HTMLDivElement>wordCard;
         element.addEventListener("click", checkCard);
-    })
+    });
+    const spyBtn: HTMLInputElement | null = document.querySelector("#spyBtn");
+    if (spyBtn) {
+        spyBtn.addEventListener("click", spyMasterView);
+    }
+    const playBtn: HTMLInputElement | null = document.querySelector("#playBtn");
+    if (playBtn) {
+        playBtn.addEventListener("click", playerView);
+    }
 }
 
 attachListeners();
