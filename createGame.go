@@ -23,15 +23,20 @@ func createGame(writer http.ResponseWriter, request *http.Request) {
 
 	err = json.NewDecoder(request.Body).Decode(&newGame)
 	if err != nil {
-		http.Error(writer, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
-		log.Println("Failure to decode client JSON:", err)
+		message := "Failure to decode client JSON: " + err.Error()
+		encodeAndSendError(writer, request, http.StatusBadRequest, message)
 		return
 	}
 	log.Println("Creating game with ID:", newGame.GameID)
 
 	//set game name for new game and add it to map of all active games
-	activeGames[newGame.GameID] = &newGame
-
+	if activeGames[newGame.GameID] == nil {
+		activeGames[newGame.GameID] = &newGame
+	} else {
+		message := "Game ID: " + newGame.GameID + " already exists"
+		encodeAndSendError(writer, request, http.StatusBadRequest, message)
+		return
+	}
 	// generate words and place them into database object -----------------------------------------------------------------
 	vals := map[string]interface{}{
 		"score":     "1-9",
@@ -47,7 +52,7 @@ func createGame(writer http.ResponseWriter, request *http.Request) {
 	get := database.HGetAll(ctx, "newGame")
 	if err := get.Err(); err != nil {
 		if err == redis.Nil {
-			fmt.Println("key does not exists")
+			log.Println("key does not exists")
 		}
 		panic(err)
 	}

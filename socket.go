@@ -5,45 +5,50 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/gorilla/websocket"
 )
 
 // newSocketConnection
 //
 func newSocketConnection(writer http.ResponseWriter, request *http.Request) {
+	var newUser User
+	var err error
+
 	// grabbing gameID
 	vars := mux.Vars(request)
 	gameID := vars["gameID"]
 
 	currentGame := activeGames[gameID]
-	var newUser User
-	var err error
-
-	//creating WebSocket
-	log.Println("recieved websocket request")
-	newUser.socket, err = upgrader.Upgrade(writer, request, nil)
-	if err != nil {
-		http.Error(writer, "Could not open websocket connection", http.StatusBadRequest)
+	if currentGame == nil {
+		message := "No current game called: " + gameID + " exists"
+		encodeAndSendError(writer, request, http.StatusBadRequest, message)
+		return
 	}
 
+	//creating WebSocket
+	log.Println("received websocket request")
+	newUser.Connection, err = upgrader.Upgrade(writer, request, nil)
+	if err != nil {
+		message := "Could not open websocket connection: " + err.Error()
+		encodeAndSendError(writer, request, http.StatusBadRequest, message)
+		return
+	}
+	newUser.GameID = gameID
+
 	currentGame.Connections = append(currentGame.Connections, newUser)
-	newUser.socket.WriteMessage(1, []byte("Connection Successful"))
-	go listenOnSocket(newUser.socket)
+	newUser.Connection.WriteMessage(1, []byte("Connection Successful"))
+	go listenOnSocket(newUser)
 }
 
 //
 //
-func listenOnSocket(connection *websocket.Conn) {
+func listenOnSocket(user User) {
 	for {
-		messageType, p, err := connection.ReadMessage()
-		if err != nil {
-			log.Println(err)
+		messageType, message, err := user.Connection.ReadMessage()
+		if err != nil || messageType != 1 {
+			log.Println("Message:", message, "; not understood by server:", err)
 			return
 		}
-		if err := connection.WriteMessage(messageType, p); err != nil {
-			log.Println(err)
-			return
-		}
-	}
+		databaseUpdate(user, string(message))
 
+	}
 }

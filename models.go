@@ -13,7 +13,8 @@ import (
 
 // User struct will
 type User struct {
-	socket *websocket.Conn
+	GameID     string          `json:"gameID"`
+	Connection *websocket.Conn `json:"connection,omitempty"`
 }
 
 // Game maintains the set of active clients and broadcasts messages to the
