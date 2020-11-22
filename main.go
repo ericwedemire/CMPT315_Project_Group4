@@ -34,8 +34,8 @@ func main() {
 	//-------------------------------------------------------------------------
 
 	//Non-API Handlers --------------------------------------------------------
-	router.HandleFunc("/socket", newSocketConnection).
-		Queries("gameID", "{gameID:[a-zA-Z0-9]+}").
+	router.HandleFunc("/games", newSocketConnection).
+		Queries("id", "{gameID:[a-zA-Z0-9]+}").
 		Methods(http.MethodGet)
 
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./dist/")))
