@@ -8,36 +8,38 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/go-redis/redis"
 )
 
-// createGame spins up a new WebSocket for a new game to be created
+// createGame will generate a Game struct to store all subsequent connections
+//to the game. createGame will always check if a game of the same name exists
+//before allowing creation
 func createGame(writer http.ResponseWriter, request *http.Request) {
-	// grabbing gameID
 	var err error
 	var newGame Game
 
+	// grabbing gameID
 	err = json.NewDecoder(request.Body).Decode(&newGame)
 	if err != nil {
 		message := "Failure to decode client JSON: " + err.Error()
 		encodeAndSendError(writer, request, http.StatusBadRequest, message)
 		return
 	}
-	log.Println("Creating game with ID:", newGame.GameID)
+	log.Println("Attempting game creation for ID:", newGame.GameID)
 
 	//set game name for new game and add it to map of all active games
 	if activeGames[newGame.GameID] == nil {
 		activeGames[newGame.GameID] = &newGame
 	} else {
-		message := "Game ID: " + newGame.GameID + " already exists"
+		message := "FAILURE: Game ID: " + newGame.GameID + " already exists"
 		encodeAndSendError(writer, request, http.StatusBadRequest, message)
 		return
 	}
 	// generate words and place them into database object -----------------------------------------------------------------
+	//generateRandomCards()
 	vals := map[string]interface{}{
 		"score":     "1-9",
 		"turn":      "red",
@@ -57,23 +59,5 @@ func createGame(writer http.ResponseWriter, request *http.Request) {
 		panic(err)
 	}
 	// generate words and place them into database object -----------------------------------------------------------------
-
-	//subscribe to database connection
-	log.Println("Successfully created game:", newGame.GameID)
-	go newGame.subscribe()
-}
-
-//
-//
-func (game *Game) subscribe() {
-	log.Println("starting subscriber for " + game.GameID)
-	subscriber := database.Subscribe(ctx, game.GameID)
-	for {
-		dbMessage, err := subscriber.ReceiveMessage(ctx)
-		if err != nil {
-			panic(err)
-		}
-
-		fmt.Println(dbMessage.Channel, dbMessage.Payload)
-	}
+	log.Println("SUCCESS: created game:", newGame.GameID)
 }

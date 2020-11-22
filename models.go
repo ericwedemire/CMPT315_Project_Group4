@@ -7,22 +7,24 @@
 package main
 
 import (
+	"sync"
+
 	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/websocket"
 )
 
 // User struct will
 type User struct {
-	GameID     string          `json:"gameID"`
+	GameID     string          `json:"gameId"`
 	Connection *websocket.Conn `json:"connection,omitempty"`
 }
 
 // Game maintains the set of active clients and broadcasts messages to the
 // clients.
 type Game struct {
-	GameID             string          `json:"gameID"`
-	Connections        []User          `json:"connections,omitempty"`
-	DatabaseConnection *websocket.Conn `json:"dbConnection,omitempty"`
+	GameID      string `json:"gameId"`
+	Connections []User `json:"connections,omitempty"`
+	mutex       sync.Mutex
 }
 
 // activeGames keeps a record of all active game sessions

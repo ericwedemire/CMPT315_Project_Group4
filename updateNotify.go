@@ -15,37 +15,23 @@ import (
 func databaseUpdate(user User, message string) {
 
 	//mutex lock on each game
+	game := activeGames[user.GameID]
+	game.mutex.Lock()
 
-	//push update to DB
+	//split message into [key, value]
 	keyValue := strings.Split(message, " ")
-	// vals := map[string]interface{}{
-	// 	"score":     "1-9",
-	// 	"turn":      "red",
-	// 	"redW":      "africa !agent !air alien amazon",
-	// 	"blueW":     "angel antarctica apple arm back",
-	// 	"assassinW": "band",
-	// 	"civilianW": "tree plant iron",
-	// }
 
-	// database.HSet(ctx, "newGame", vals)
-
-	// get := database.HGetAll(ctx, "newGame")
-	// if err := get.Err(); err != nil {
-	// 	if err == redis.Nil {
-	// 		log.Println("key does not exists")
-	// 	}
-	// 	panic(err)
-	// }
-
-	//activeGames[user.GameID]
+	//alter cardValue in database
 	alterResult := alterCardState(user.GameID, keyValue)
 	if alterResult == "" {
 		return
 	}
 	database.HSet(ctx, user.GameID, keyValue[0], alterResult)
 
+	//notify players about selection
 	notify(keyValue[1], user.GameID)
-	//mutex unlock
+	//unlock mutex
+	game.mutex.Unlock()
 }
 
 // notify will be called after a database entry has been updated following a
@@ -70,8 +56,6 @@ func alterCardState(gameID string, keyValue []string) string {
 		log.Println("key does not exists")
 		return ""
 	}
-
 	//replace cardValue with !cardValue for database insertion
 	return strings.Replace(valuesFromKey.Val(), " "+keyValue[1]+" ", " !"+keyValue[1]+" ", 1)
-
 }

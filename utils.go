@@ -6,7 +6,9 @@ import (
 	"net/http"
 )
 
-//encodeAndSendError
+// encodeAndSendError takes the http status code and a message to be sent to a
+//client. It will encode that message in a http response body and write the
+//given status code to the header
 func encodeAndSendError(writer http.ResponseWriter, request *http.Request, status int, message string) {
 	http.Error(writer, http.StatusText(status), status)
 	writer.Header().Set("Content-Type", "application/json")
@@ -18,4 +20,10 @@ func encodeAndSendError(writer http.ResponseWriter, request *http.Request, statu
 	}
 	log.Println(message)
 	return
+}
+
+// deleteFromMap was placed here because importing github.com/go-redis/redis
+//overwrites the native go delete() function from removing items from a map
+func deleteFromMap(gameID string) {
+	delete(activeGames, gameID)
 }
