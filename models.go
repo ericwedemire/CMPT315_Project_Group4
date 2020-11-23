@@ -38,6 +38,12 @@ type GameState struct {
 	GameOver      bool   `json:"gameOver"`
 }
 
+// TurnState is used to pass updates to client connections everytime a word is
+//selected.
+type TurnState struct {
+	Turn string `json:"turn"`
+}
+
 // activeGames keeps a record of all active game sessions
 var activeGames map[string]*Game = make(map[string]*Game)
 

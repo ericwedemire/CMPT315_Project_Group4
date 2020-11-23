@@ -21,9 +21,3 @@ func encodeAndSendError(writer http.ResponseWriter, request *http.Request, statu
 	log.Println(message)
 	return
 }
-
-// deleteFromMap was placed here because importing github.com/go-redis/redis
-//overwrites the native go delete() function from removing items from a map
-func deleteFromMap(gameID string) {
-	delete(activeGames, gameID)
-}
