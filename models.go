@@ -20,11 +20,22 @@ type User struct {
 }
 
 // Game maintains the set of active clients and broadcasts messages to the
-// clients.
+//clients.
 type Game struct {
 	GameID      string `json:"gameId"`
 	Connections []User `json:"connections,omitempty"`
 	mutex       sync.Mutex
+}
+
+// GameState is used to pass updates to client connections everytime a word is
+//selected.
+type GameState struct {
+	GameID        string `json:"gameId"`
+	LastSelection string `json:"lastSelection"`
+	RedScore      int    `json:"redScore"`
+	BlueScore     int    `json:"blueScore"`
+	Turn          string `json:"turn"`
+	GameOver      bool   `json:"gameOver"`
 }
 
 // activeGames keeps a record of all active game sessions
@@ -48,5 +59,5 @@ const FULLHOST = WEBHOST + ":" + WEBPORT
 //package-private access to database connection
 var database *redis.Client
 
-//
+//upgrader params for upgrading HTTP to WebSocket Connections
 var upgrader = websocket.Upgrader{}
