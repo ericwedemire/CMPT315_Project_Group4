@@ -11,7 +11,7 @@ import (
 
 // databaseUpdate receives a message from the frontend WebSocket connection in
 //form of:
-//		{cardType, cardClicked}
+//		"cardType cardClicked"
 //It will use this key,value pair to update the redis database accordingly and
 //notify all users who are listening in that game
 func databaseUpdate(user User, message string) {
@@ -20,6 +20,15 @@ func databaseUpdate(user User, message string) {
 
 	//mutex lock
 	game.mutex.Lock()
+
+	if message == "SKIP" {
+		skipTurn(user.GameID)
+
+		//early unlock when turn skip called
+		game.mutex.Unlock()
+		return
+	}
+
 	log.Println("Attempting card selection for:", message)
 
 	//split message into [key, value]
@@ -39,7 +48,7 @@ func databaseUpdate(user User, message string) {
 
 	//database call to change score & turn and mark card as selected
 	pipeline := database.TxPipeline()
-	defer pipeline.Close()
+	defer pipeline.Close() //close pipeline on failure
 	var err error
 
 	// changing score; civilian cards alter no points, and so that case will
@@ -84,10 +93,11 @@ func databaseUpdate(user User, message string) {
 			gameState.Turn = "red"
 		}
 		pipeline.Do(ctx, "HSET", user.GameID, "turn", turn)
+		log.Println("turned changed to:", turn)
 	} else {
 		gameState.Turn = keyValue[0]
+		log.Println("turned remained as:", turn)
 	}
-	log.Println("turned changed to:", turn)
 
 	// mark card as selected in game state
 	pipeline.Do(ctx, "HSET", user.GameID, keyValue[0], alterResult)
@@ -104,12 +114,40 @@ func databaseUpdate(user User, message string) {
 	log.Println("SUCCESS: card:", keyValue[0], keyValue[1], "was selected")
 }
 
+// skipTurn is called when clients send "SKIP" messages through their WebSocket
+func skipTurn(gameID string) {
+	currentTurn := database.HGet(ctx, gameID, "turn").Val()
+	switch currentTurn {
+	case "red":
+		currentTurn = "blue"
+	case "blue":
+		currentTurn = "red"
+	}
+
+	database.HSet(ctx, gameID, "turn", currentTurn)
+	var turnStatus TurnState
+	turnStatus.Turn = currentTurn
+
+	notify(gameID, turnStatus)
+
+	log.Println("turned skipped to:", currentTurn)
+}
+
 // notify will be called after a database entry has been updated following a
 //slection on a card. This function will then notify all listeners on a game
 //that a card has been selected
 //
-// Messages sent to WebSockets will
-func notify(gameID string, status GameState) {
+// Messages sent to WebSockets will be sent as JSON objects as such:
+// {
+// 	"gameId": string,
+// 	"lastSelection": string,
+// 	"redScore": int,
+// 	"blueScore": int,
+// 	"turn": string,
+// 	"gameOver": bool
+// }
+//
+func notify(gameID string, status interface{}) {
 	game := activeGames[gameID]
 	outboud, err := json.Marshal(status)
 	if err != nil {
@@ -133,8 +171,6 @@ func alterCardState(gameID string, keyValue []string) string {
 		log.Println("key does not exists")
 		return ""
 	}
-
-	//update score
 
 	//replace cardValue with !cardValue for database insertion
 	return strings.Replace(valuesFromKey.Val(), " "+keyValue[1]+" ", " !"+keyValue[1]+" ", 1)

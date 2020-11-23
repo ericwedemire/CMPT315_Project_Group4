@@ -11,7 +11,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v8"
 )
 
 // createGame will generate a Game struct to store all subsequent connections
