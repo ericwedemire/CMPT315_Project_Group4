@@ -41,12 +41,13 @@ func createGame(writer http.ResponseWriter, request *http.Request) {
 	// generate words and place them into database object -----------------------------------------------------------------
 	//generateRandomCards()
 	vals := map[string]interface{}{
-		"score":     "1-9",
-		"turn":      "red",
-		"redW":      "africa !agent !air alien amazon",
-		"blueW":     "angel antarctica apple arm back",
-		"assassinW": "band",
-		"civilianW": "tree plant iron",
+		"score:red":  "9",
+		"score:blue": "9",
+		"turn":       "red",
+		"red":        "africa !agent !air alien amazon",
+		"blue":       "angel antarctica apple arm back",
+		"assassin":   "band",
+		"civilian":   "tree plant iron",
 	}
 
 	database.HSet(ctx, "newGame", vals)

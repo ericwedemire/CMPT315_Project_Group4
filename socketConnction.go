@@ -28,7 +28,7 @@ func newSocketConnection(writer http.ResponseWriter, request *http.Request) {
 	}
 
 	//creating WebSocket
-	log.Println("received websocket request")
+	log.Println("Attempting new client WebSocket creation for game:", gameID)
 	newUser.Connection, err = upgrader.Upgrade(writer, request, nil)
 	if err != nil {
 		message := "Could not open websocket connection: " + err.Error()
@@ -38,9 +38,12 @@ func newSocketConnection(writer http.ResponseWriter, request *http.Request) {
 	newUser.GameID = gameID
 
 	currentGame.Connections = append(currentGame.Connections, newUser)
+
 	//give current game state to new connection
 	newUser.Connection.WriteMessage(1, []byte("Connection Successful"))
+
 	//calling listener in go routine
+	log.Println("SUCCESS: created socket:", gameID)
 	go listenOnSocket(newUser)
 }
 
