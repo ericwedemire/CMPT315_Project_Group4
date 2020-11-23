@@ -13,7 +13,7 @@ PORT = 6379
 We used a Docker based redis database for our implementation. Initially it was
 spun up on WSL with the command:
 ```linux
-sudo docker run --name projectDB -p 6379:6379 -d redis
+    sudo docker run --name projectDB -p 6379:6379 -d redis
 ```
 
 ## Functionality
@@ -41,13 +41,13 @@ to be given as a space-seperated string in the form of:
     "cardType cardWord"
 where:
 ```golang
-cardType = "red"|"blue"|"civilian"|"assassin"
-cardWord = any single word string
+    cardType = "red"|"blue"|"civilian"|"assassin"
+    cardWord = any single word string
 ```
 
 If a skip command is given, the server expects the following message:
 ```golang
-"SKIP"
+    "SKIP"
 ```
 
 #### Client-bound messages (server->client):
@@ -55,41 +55,40 @@ When the server is updating a client after a card selection has been made,
 clients can expect information back in the form of JSON with values as
 follows:
 ```javascript
-{
-    "gameId": string,
-    "lastSelection": string,
-    "redScore": int,
-    "blueScore": int,
-    "turn": string,
-    "gameOver": bool
-}
+    {
+        "gameId": string,
+        "lastSelection": string,
+        "redScore": int,
+        "blueScore": int,
+        "turn": string,
+        "gameOver": bool
+    }
 ```
 
 If a turn has been skipped, the client side WebSocket will receive a
 response message formatted as a single value JSON:
 ```javascript
-{
-    "turn": string,
-}
+    {
+        "turn": string,
+    }
 ```
 
 Upon joining a game with a WebSocket connection, the server with reply with
 the full game state of all relevant information structured as:
 ```javascript
-{
-    "assassin": string,
-    "blue": space-seperated words,
-    "civilian": space-seperated words,
-    "red": space-seperated words,
-    "score:blue": int,
-    "score:red": int,
-    "turn": "red"|"blue"
-}
+    {
+        "assassin": string,
+        "blue": space-seperated words,
+        "civilian": space-seperated words,
+        "red": space-seperated words,
+        "score:blue": int,
+        "score:red": int,
+        "turn": "red"|"blue"
+    }
 ```
 Words for each type will be structured as:
 ```javascript
-"africa !agent !air alien amazon"
+    "africa !agent !air alien amazon"
 ```
 where each word is seperated by a single space and those words that have
 been previously selected are denoted by a ! at the beginning of the word
-    
