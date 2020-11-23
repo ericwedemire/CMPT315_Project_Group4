@@ -36,34 +36,34 @@ When clients are sending card selections to the server, they are expected
 to be given as a space-seperated string in the form of:
     "cardType cardWord"
 where:
-    cardType = "red"|"blue"|"civilian"|"assassin"
-    cardWord = any single word string
+    `cardType = "red"|"blue"|"civilian"|"assassin"
+    cardWord = any single word string`
 
 If a skip command is given, the server expects the following message:
-    "SKIP"
+    `"SKIP"`
 
 #### Client-bound messages (server->client):
 When the server is updating a client after a card selection has been made,
 clients can expect information back in the form of JSON with values as
 follows:
-    {
+    `{
         "gameId": string,
         "lastSelection": string,
         "redScore": int,
         "blueScore": int,
         "turn": string,
         "gameOver": bool
-    }
+    }`
 
 If a turn has been skipped, the client side WebSocket will receive a
 response message formatted as a single value JSON:
-    {   
+    `{   
         "turn": string,
-    }
+    }`
 
 Upon joining a game with a WebSocket connection, the server with reply with
 the full game state of all relevant information structured as:
-    {
+    `{
         "assassin": string,
         "blue": space-seperated words,
         "civilian": space-seperated words,
@@ -71,9 +71,9 @@ the full game state of all relevant information structured as:
         "score:blue": int,
         "score:red": int,
         "turn": "red"|"blue"
-    }
+    }`
 Words for each type will be structured as:
-    "africa !agent !air alien amazon"
+    `"africa !agent !air alien amazon"`
 where each word is seperated by a single space and those words that have
 been previously selected are denoted by a ! at the beginning of the word
     
