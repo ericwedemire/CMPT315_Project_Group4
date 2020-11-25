@@ -8,8 +8,11 @@ package main
 
 import (
 	"encoding/json"
+	"io/ioutil"
 	"log"
+	"math/rand"
 	"net/http"
+	"strings"
 
 	"github.com/go-redis/redis/v8"
 )
@@ -40,14 +43,38 @@ func createGame(writer http.ResponseWriter, request *http.Request) {
 	}
 	// generate words and place them into database object -----------------------------------------------------------------
 	//generateRandomCards()
+
+	// draw n number or random cards
+	words := drawCards()
+
+	// select who goes first
+	// who goes first determines how many cards a team needs to guess
+	turns := [2]string{"red", "blue"}
+	turn := turns[rand.Intn(2)]
+
+	redScore := 9
+	blueScore := 9
+
+	if turn == "blue" {
+		redScore -= 1
+	} else {
+		blueScore -= 1
+	}
+
+	// create strings for vals interface
+	redCards := words[:redScore]
+	blueCards := words[redScore : redScore+blueScore]
+	civCards := words[redScore+blueScore : len(words)-1]
+	assassin := words[len(words)-1]
+
 	vals := map[string]interface{}{
-		"score:red":  "9",
-		"score:blue": "9",
-		"turn":       "red",
-		"red":        "africa !agent !air alien amazon",
-		"blue":       "angel antarctica apple arm back",
-		"assassin":   "band",
-		"civilian":   "tree plant iron",
+		"score:red":  redScore,
+		"score:blue": blueScore,
+		"turn":       turn,
+		"red":        strings.Join(redCards, " "),
+		"blue":       strings.Join(blueCards, " "),
+		"assassin":   assassin,
+		"civilian":   strings.Join(civCards, " "),
 	}
 
 	database.HSet(ctx, "newGame", vals)
@@ -61,4 +88,25 @@ func createGame(writer http.ResponseWriter, request *http.Request) {
 	}
 	// generate words and place them into database object -----------------------------------------------------------------
 	log.Println("SUCCESS: created game:", newGame.GameID)
+}
+
+func drawCards() []string {
+	dat, err := ioutil.ReadFile("./wordlist.txt")
+	if err != nil {
+		panic(err)
+	}
+
+	cards := make([]string, 25)
+	words := strings.Split(string(dat), "\n")
+	for i := 0; i < 25; i++ {
+		// select random word and place in cards at index i
+		j := rand.Intn(len(words))
+		cards[i] = words[j]
+
+		// remove selected word from words list
+		words[j] = words[len(words)-1]
+		words[len(words)-1] = ""
+		words = words[:len(words)-1]
+	}
+	return cards
 }
