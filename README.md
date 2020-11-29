@@ -42,9 +42,9 @@ make a subsequent connection request through the WebSocket API to:
 
 When clients are sending card selections to the server, they are expected
 to be given as a space-seperated string in the form of:
-    "cardType cardWord"
-where:
 ```golang
+   "cardType cardWord"
+where:
     cardType = "red"|"blue"|"civilian"|"assassin"
     cardWord = any single word string  
 ```
