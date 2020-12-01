@@ -9,9 +9,14 @@ package main
 import (
 	"log"
 	"net/http"
+	"text/template"
 
 	"github.com/gorilla/mux"
 )
+
+type tempHandler struct {
+	temp *template.Template
+}
 
 // main spins up the mux router, database connection, defines the handler
 // functions, logging middleware, and finally the server
@@ -24,10 +29,18 @@ func main() {
 	//close DB on panic
 	defer database.Close()
 
+	// tmp := &tempHandler{temp: template.Must(template.ParseFiles("dist/game.tmpl"))}
+	template := &tempHandler{temp: template.Must(template.ParseFiles("dist/templates/game.tmpl"))}
 	//API Handlers ------------------------------------------------------------
 	// Creates new game by setting up websocket
 	router.HandleFunc("/api/v1/games", createGame).
 		Methods(http.MethodPost)
+
+	// router.HandleFunc("/games/{postId:[0-9]+")
+
+	router.PathPrefix("/games/{id}").
+		Methods(http.MethodGet).
+		HandlerFunc(template.passTemplate)
 
 	// Default
 	router.HandleFunc("/api/v1/", defaultHandle)

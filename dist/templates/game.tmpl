@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../game.css">
+    <title>Codenames | #id </title>
+    <script type="text/x-dot-template" id="link-container-template"></script>
+    <script type="text/x-dot-template" id="player-turn-template"></script>
+    <script type="text/x-dot-template" id="board-template"></script>
+
+
+</head>
+
+<body id="{{.ID}}">
+    <p id="socket"></p>
+    <h1 id="home-header">
+        <a href="index.html">codenames</a>
+    </h1>
+
+    <div class="link-container">
+        Share this link with your friends: <a href="" class="link">{{.ID}}</a>
+    </div>
+
+    <div class="scoreboard">
+        <p class="blue-scoreboard">9</p>
+        -
+        <p class="red-scoreboard">8</p>
+    </div>
+    <div class="player-turn">
+        Somebody's turn
+    </div>
+
+    <div class="board">
+        <div class="tile11">a</div>
+        <div class="tile12">b</div>
+        <div class="tile13">c</div>
+        <div class="tile14">d</div>
+        <div class="tile15">e</div>
+
+        <div class="tile21">e</div>
+        <div class="tile22">f</div>
+        <div class="tile23">g</div>
+        <div class="tile24">h</div>
+        <div class="tile25">i</div>
+
+        <div class="tile11">j</div>
+        <div class="tile12">k</div>
+        <div class="tile13">l</div>
+        <div class="tile14">m</div>
+        <div class="tile15">n</div>
+
+        <div class="tile21">o</div>
+        <div class="tile22">p</div>
+        <div class="tile23">q</div>
+        <div class="tile24">r</div>
+        <div class="tile25">s</div>
+
+        <div class="tile21">t</div>
+        <div class="tile22">u</div>
+        <div class="tile23">v</div>
+        <div class="tile24">w</div>
+        <div class="tile25">x</div>
+    </div>
+
+    <div class="btn-container">
+        <input type="submit" id="btn-player" value="player">
+        <input type="submit" id="btn-spymaster" value="spymaster">
+        <input type="submit" id="btn-next-game" value="Next game">
+    </div>
+    <script src="../main.js"></script>
+</body>
+
+</html>
