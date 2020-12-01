@@ -12,7 +12,9 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/mux"
@@ -117,12 +119,19 @@ func drawCards() []string {
 	for i := 0; i < 25; i++ {
 		// select random word and place in cards at index i
 		j := rand.Intn(len(words))
-		cards[i] = strings.TrimSuffix(words[j], "\r")
+		cards[i] = strings.TrimSuffix(words[j], "\r") + " " + strconv.Itoa(i+1)
 
 		// remove selected word from words list
 		words[j] = words[len(words)-1]
 		words[len(words)-1] = ""
 		words = words[:len(words)-1]
 	}
+	shuffleCards(cards)
+	return cards
+}
+
+func shuffleCards(cards []string) []string {
+	rand.Seed(time.Now().UnixNano())
+	rand.Shuffle(len(cards), func(i, j int) { cards[i], cards[j] = cards[j], cards[i] })
 	return cards
 }

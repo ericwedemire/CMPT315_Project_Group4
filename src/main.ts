@@ -6,27 +6,25 @@
 
 var socket: WebSocket;
 
-function socketReturn() {
-    var webSocket;
-    webSocket = initWS();
+const path = window.location.pathname;
+const id = path.split("/")[2]
 
-    function initWS() {
-        socket = new WebSocket("ws://localhost:8008/games?id=newGame")
+socket = new WebSocket("ws://localhost:8008/games?id=" + id);
 
-        socket.onopen = function () {
-            const para: HTMLParagraphElement | null = document.querySelector('#socket');
-            if (para) { para.textContent = "Wow"; }
-        };
+// socket.onopen = function () {
+//     const para: HTMLParagraphElement | null = document.querySelector('#socket');
+//     if (para) { para.textContent = "Wow"; }
+// };
 
-        socket.addEventListener('message', function (event) {
-
-            console.log('SERVER MESSAGE:', event.data);
-            window.location.assign('/game.html')
-
-        });
-        return socket;
+socket.addEventListener('message', function (event) {
+    let gameData = JSON.parse(event.data);
+    const board: HTMLDivElement | null = document.querySelector('.board');
+    if (board) {
+        dealCards(gameData);
+        assignTurn(gameData);
+        attachListeners();
     }
-}
+});
 
 function createGame() {
     let idInput = <HTMLInputElement>document.querySelector("#game-id");
@@ -40,81 +38,53 @@ function createGame() {
     };
 
     const apiCall = new Request("http://localhost:8008/api/v1/games", myInit);
-    console.log(jsonBody)
-    console.log(myInit)
     fetch(apiCall)
         .then(response => {
-            console.log(response);
             if (response.status === 400) {
                 console.log("NAME EXISTS")
-            }
+            } window.location.assign('/games/' + gameId);
         });
-    // socketReturn(gameId)
 }
 
 
-function dealCards(id: string) {
-    // Get game cards with game ID
-
-    const req = new XMLHttpRequest();
-    req.open("GET", "games?id=monday");
-    req.setRequestHeader("Content-type", "application/json");
-    req.onreadystatechange = function () {
-        if (this.readyState === XMLHttpRequest.DONE && this.status == 200) {
-            let data = JSON.parse(req.responseText);
-            let words = data.words; // object containing words for red, blue, neutral, assassin
-            console.log(words);
-            let shuffledCards = shuffleCards(words);
-            assignWords(shuffledCards);
-        }
-    }
-    req.send();
-}
-
-
-function shuffleCards(words: any): any[] {
-    // Create array of cards with words object
-    // The array contains card objects made up of the word and it's type
+function dealCards(gameData: any) {
+    // WIP with Shea
+    // Bug where some of the positions get injected as card name to fix
     let cards: any[] = [];
-    for (let wordCategory of words) {
-        for (let word of wordCategory) {
-            let card = { word: word, type: wordCategory, status: "unselected" };
-            cards.push(card);
+    let cardTypes = ["assassin", "civilian", "red", "blue"]
+    console.log(gameData)
+    for (let [key, value] of Object.entries(gameData)) {
+        if (cardTypes.includes(key)) {
+            let valueString = value + ""
+            let words = valueString.split(" ");
+            for (let i = 0; i < words.length; i += 2) {
+                let selected = "";
+                if (words[i].includes("!")) {
+                    selected = "selected"
+                }
+                let card = { word: words[i], wordCategory: key, position: words[i + 1], status: selected }
+                cards.push(card)
+            }
         }
     }
-    console.log("Unshuffled cards =", cards);
-    shuffle(cards);
-    console.log("Shuffled cards =", cards)
-    return cards;
+    console.log(cards);
+    assignWords(cards.sort((a, b) => (Number(a.position) > Number(b.position)) ? 1 : -1));
 }
 
-// Fisher-Yates array shuffle
-// https://github.com/coolaj86/knuth-shuffle
-
-function shuffle(cards: any[]) {
-    let currentIndex = cards.length, temporaryValue, randomIndex;
-
-    while (0 !== currentIndex) {
-        randomIndex = Math.floor(Math.random()) * currentIndex;
-        currentIndex -= 1;
-
-        temporaryValue = cards[currentIndex];
-        cards[currentIndex] = cards[randomIndex];
-        cards[randomIndex] = temporaryValue;
-    }
-
-    return cards;
-}
-
-function assignWords(cards: string[]) {
-    // uses doT template
-    // Assign the word of a card to the inner HTML
-    // Assign the type of a card to the class of the card div
-    const tmpl = document.querySelector("#game_board_template").innerHTML;
+function assignWords(cards: object[]) {
+    const tmpl = document.querySelector("#board-template").innerHTML;
     if (tmpl && cards.length != 0) {
         const renderFn = doT.template(tmpl);
         const renderResult = renderFn({ "cards": cards });
         document.querySelector(".board").innerHTML = renderResult;
+    }
+}
+
+function assignTurn(gameData: any) {
+    let turn = document.querySelector(".player-turn");
+    if (turn) {
+        let turnString = gameData.turn + ""
+        turn.innerHTML = turnString[0].toUpperCase() + turnString.slice(1) + "'s turn"
     }
 }
 
@@ -124,46 +94,24 @@ function assignWords(cards: string[]) {
  * then changes the unselected class to selected, activating the card's color. 
  */
 function checkCard(event: MouseEvent) {
-
-    let card = <HTMLDivElement>event.target;
-    let word = card.classList;
-    let query: HTMLDivElement | null = document.querySelector("#gameTurn");
-    let gameTurn = "";
-    if (query) {
-        // let's just say the innerHTML can either be "blue" or "red"
-        gameTurn = query.innerHTML;
-        // card cannot have been already picked
-        if (!word.contains("selected")) {
-            // flag that card has been picked
-            // <div class="wordCard"> => <div class="wordCard selected">
-            word.add("selected");
-            if (word.contains("assassin")) {
-                // TODO: end game
-            } else if (!word.contains(gameTurn)) {
-                // switch turn if wrong card chosen
-                if (gameTurn == "red") {
-                    query.innerHTML = "blue";
-                } else {
-                    query.innerHTML = "red";
-                }
-            }
-        }
-    }
-    return 0;
+    // TODO
 }
 
 function spyMasterView() {
-    // TODO: Remove "End player turn" button?
-    let cards = document.querySelectorAll(".wordCards");
+    // WIP with Shea
+    console.log("hi")
+    let cards = document.querySelectorAll(".wordCard");
+    console.log(cards.length)
     cards.forEach(function (card) {
         let cardClasses = card.classList;
-        console.log(cardClasses);
+        // console.log(cardClasses);
         card.setAttribute("font-weight", "bold");
-        if (cardClasses[1] && cardClasses[1] != "assassin") {
-            if (cardClasses[1] != "assassin") {
-                card.setAttribute("color", cardClasses[1]);
-            } else {
+        if (cardClasses[0] && cardClasses[1] != "assassin") {
+            if (cardClasses[2] == "blue" || cardClasses[2] == "red") {
+                card.setAttribute("color", cardClasses[2]);
+            } else if (cardClasses[2] == "civilian") {
                 card.setAttribute("color", "white");
+            } else {
                 card.setAttribute("background-colour", "black");
             }
         }
@@ -171,16 +119,14 @@ function spyMasterView() {
 }
 
 function playerView() {
-    // TODO: Reactivate "End player turn" button?
-    let cards = document.querySelectorAll(".wordCards");
+    // WIP with Shea
+    let cards = document.querySelectorAll(".wordCard");
     cards.forEach(function (card) {
         let cardClasses = card.classList;
-        console.log(cardClasses);
+        // console.log(cardClasses);
         card.removeAttribute("font-weight");
-        card.setAttribute("background-colour", "grey");
-        if (cardClasses.contains("assassin")) {
-            card.setAttribute("color", "black");
-        }
+        card.removeAttribute("background-colour");
+        card.removeAttribute("color");
     });
 }
 
@@ -201,17 +147,6 @@ function createLinkTemplate(linkTemplate: HTMLScriptElement) {
     linkTemplate.appendChild(div);
 }
 
-// create element for player-turn-template
-// <script type="text/x-dot-template" id = "player-turn-template" >
-//     <div>{{=it.turn }}'s turn</div>
-// < /script>
-
-function createTurnTemplate(turnTemplate: HTMLScriptElement) {
-    let div = document.createElement("div");
-    div.textContent = "{{=it.turn}}'s";
-    turnTemplate.appendChild(div);
-}
-
 // create element for board-template
 // <script type="text/x-dot-template" id = "board-template" >
 //     {{ ~it.cards: value: index }}
@@ -222,7 +157,7 @@ function createTurnTemplate(turnTemplate: HTMLScriptElement) {
 function createBoardTemplate(boardTemplate: HTMLScriptElement): string {
 
     let div = document.createElement("div");
-    div.className = '"{{=value["wordCategory"]}}" "tile{{=index+1}}"';
+    div.className = "wordCard tile{{=index+1}} {{=value['wordCategory']}}";
     div.textContent = '{{=value["word"]}}';
     boardTemplate.insertAdjacentText('afterbegin', '{{~it.cards:value:index}}');
     boardTemplate.appendChild(div);
@@ -248,22 +183,17 @@ function attachListeners() {
         let element = <HTMLDivElement>wordCard;
         element.addEventListener("click", checkCard);
     });
-    const spyBtn: HTMLInputElement | null = document.querySelector("#spyBtn");
+    const spyBtn: HTMLInputElement | null = document.querySelector("#btn-spymaster");
     if (spyBtn) {
         spyBtn.addEventListener("click", spyMasterView);
     }
-    const playBtn: HTMLInputElement | null = document.querySelector("#playBtn");
+    const playBtn: HTMLInputElement | null = document.querySelector("#btn-player");
     if (playBtn) {
         playBtn.addEventListener("click", playerView);
     }
-    const para: HTMLParagraphElement | null = document.querySelector('#socket');
-    if (para) { para.textContent = "Things will be okay..."; }
 
     const linkTemp: HTMLScriptElement | null = document.querySelector("#link-container-template");
     if (linkTemp) { createLinkTemplate(linkTemp) }
-
-    const turnTemp: HTMLScriptElement | null = document.querySelector("#player-turn-template");
-    if (turnTemp) { createTurnTemplate(turnTemp) }
 
     const boardTemp: HTMLScriptElement | null = document.querySelector("#board-template");
     if (boardTemp) {
