@@ -15,7 +15,12 @@ import (
 	"strings"
 
 	"github.com/go-redis/redis/v8"
+	"github.com/gorilla/mux"
 )
+
+type templateData struct {
+	ID string
+}
 
 // createGame will generate a Game struct to store all subsequent connections
 //to the game. createGame will always check if a game of the same name exists
@@ -32,7 +37,6 @@ func createGame(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	log.Println("Attempting game creation for ID:", newGame.GameID)
-
 	//set game name for new game and add it to map of all active games
 	if activeGames[newGame.GameID] == nil {
 		activeGames[newGame.GameID] = &newGame
@@ -56,9 +60,9 @@ func createGame(writer http.ResponseWriter, request *http.Request) {
 	blueScore := 9
 
 	if turn == "blue" {
-		redScore -= 1
+		redScore--
 	} else {
-		blueScore -= 1
+		blueScore--
 	}
 
 	// create strings for vals interface
@@ -76,10 +80,9 @@ func createGame(writer http.ResponseWriter, request *http.Request) {
 		"assassin":   assassin,
 		"civilian":   strings.Join(civCards, " "),
 	}
+	database.HSet(ctx, newGame.GameID, vals)
 
-	database.HSet(ctx, "newGame", vals)
-
-	get := database.HGetAll(ctx, "newGame")
+	get := database.HGetAll(ctx, newGame.GameID)
 	if err := get.Err(); err != nil {
 		if err == redis.Nil {
 			log.Println("key does not exists")
@@ -88,6 +91,19 @@ func createGame(writer http.ResponseWriter, request *http.Request) {
 	}
 	// generate words and place them into database object -----------------------------------------------------------------
 	log.Println("SUCCESS: created game:", newGame.GameID)
+}
+
+func (t *tempHandler) passTemplate(w http.ResponseWriter, r *http.Request) {
+
+	vars := mux.Vars(r)
+	tdata := templateData{
+		ID: vars["id"],
+	}
+	err := t.temp.ExecuteTemplate(w, "game.tmpl", tdata)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 func drawCards() []string {
@@ -101,7 +117,7 @@ func drawCards() []string {
 	for i := 0; i < 25; i++ {
 		// select random word and place in cards at index i
 		j := rand.Intn(len(words))
-		cards[i] = words[j]
+		cards[i] = strings.TrimSuffix(words[j], "\r")
 
 		// remove selected word from words list
 		words[j] = words[len(words)-1]
