@@ -3,11 +3,6 @@
  * CMPT315
  * Group Project: Codenames
  */
-
-import { send } from "process";
-
-// import doT from "dot";
-// import { send } from "process";
 var socket: WebSocket;
 
 const path = window.location.pathname;
@@ -112,8 +107,6 @@ function checkGameState(gameData: any) {
             let winner = document.querySelector(".player-turn").innerHTML.slice(0, -7);
             document.querySelector(".player-turn").innerHTML = "Victory for " + winner + "!";
         }
-
-        // detach listeners?
     }
 }
 
