@@ -266,7 +266,7 @@ function attachListeners() {
 
     const skipBtn: HTMLInputElement | null = document.querySelector("#btn-skip-turn");
     if (skipBtn) {
-        skipBtn?.addEventListener("click", skipTurn);
+        skipBtn.addEventListener("click", skipTurn);
     }
     const linkTemp: HTMLScriptElement | null = document.querySelector("#link-container-template");
     if (linkTemp) { createLinkTemplate(linkTemp) }
