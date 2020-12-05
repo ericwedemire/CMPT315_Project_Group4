@@ -130,27 +130,10 @@ function checkCard(event: MouseEvent) {
     // Grab div clicked
     let card = event.currentTarget as HTMLElement;
 
-    // let currentTile = card.classList[1];
-
     // Format card to "cardType cardWord" so the API can understand and respond appropriately
     let cardType = card.classList[2];
     let cardWord = card.innerHTML;
     let cardSelection = cardType + " " + cardWord;
-
-
-    // Change background color to match cardType selected
-    // if (cardType == "blue" || cardType == "red") {
-    //     card.style.backgroundColor = cardType;
-    // }
-
-    // else if (cardType == "assassin") {
-    //     card.style.backgroundColor = "black";
-    // }
-
-    // else if (cardType == "civilian") {
-    //     card.style.backgroundColor = "yellow";
-    //     card.style.color = "black";
-    // }
 
     // Send the card selected to the backend to be marked selected
     socket.send(cardSelection);
