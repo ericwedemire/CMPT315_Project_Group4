@@ -16,6 +16,7 @@ socket.addEventListener('message', function (event) {
     if (board) {
         dealCards(gameData);
         updateScoreboard(gameData);
+        updateView(gameData);
         assignTurn(gameData);
         attachListeners();
         checkGameState(gameData);
@@ -136,23 +137,52 @@ function checkCard(event: MouseEvent) {
     let cardWord = card.innerHTML;
     let cardSelection = cardType + " " + cardWord;
 
-    
+
     // Change background color to match cardType selected
-    if (cardType == "blue" || cardType == "red") {
-        card.style.backgroundColor = cardType;
-    }
+    // if (cardType == "blue" || cardType == "red") {
+    //     card.style.backgroundColor = cardType;
+    // }
 
-    else if (cardType == "assassin") {
-        card.style.backgroundColor = "black";
-    }
+    // else if (cardType == "assassin") {
+    //     card.style.backgroundColor = "black";
+    // }
 
-    else if (cardType == "civilian") {
-        card.style.backgroundColor = "yellow";
-        card.style.color = "black";
-    }
+    // else if (cardType == "civilian") {
+    //     card.style.backgroundColor = "yellow";
+    //     card.style.color = "black";
+    // }
 
     // Send the card selected to the backend to be marked selected
     socket.send(cardSelection);
+}
+
+function updateView(gameData: any) {
+    let lastSelection = gameData.lastSelection;
+    let wordCards = document.querySelectorAll(".wordCard");
+    wordCards.forEach(function (wordCard) {
+        let element = <HTMLElement>wordCard;
+        if (element.innerHTML == lastSelection) {
+            console.log(element.classList[2]);
+            switch (element.classList[2]) {
+                case "blue":
+                    element.style.backgroundColor = "blue";
+                    break;
+                case "red":
+                    element.style.backgroundColor = "red";
+                    break;
+                case "assassin":
+                    element.style.backgroundColor = "white";
+                    break;
+                case "civilian":
+                    element.style.backgroundColor = "yellow";
+                    element.style.color = "black";
+                    break;
+                default:
+                    return;
+            }
+        }
+    });
+
 }
 
 function spyMasterView() {
