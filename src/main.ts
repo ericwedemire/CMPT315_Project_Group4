@@ -171,7 +171,7 @@ function updateView(gameData: any) {
                     element.style.backgroundColor = "red";
                     break;
                 case "assassin":
-                    element.style.backgroundColor = "white";
+                    element.style.backgroundColor = "black";
                     break;
                 case "civilian":
                     element.style.backgroundColor = "yellow";
