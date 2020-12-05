@@ -10,15 +10,9 @@ const id = path.split("/")[2]
 
 socket = new WebSocket("ws://localhost:8008/games?id=" + id);
 
-// socket.onopen = function () {
-//     const para: HTMLParagraphElement | null = document.querySelector('#socket');
-//     if (para) { para.textContent = "Wow"; }
-// };
-
 socket.addEventListener('message', function (event) {
     let gameData = JSON.parse(event.data);
     const board: HTMLDivElement | null = document.querySelector('.board');
-    console.log(gameData.gameOver);
     if (board) {
         dealCards(gameData);
         updateScoreboard(gameData);
@@ -57,12 +51,9 @@ function skipTurn() {
 }
 
 function dealCards(gameData: any) {
-    // WIP with Shea
-    // Bug where some of the positions get injected as card name to fix
+
     let cards: any[] = [];
     let cardTypes = ["assassin", "civilian", "red", "blue"]
-    console.log("GAME DATA: ");
-    console.log(gameData)
     for (let [key, value] of Object.entries(gameData)) {
         if (cardTypes.includes(key)) {
             let valueString = value + ""
@@ -77,7 +68,6 @@ function dealCards(gameData: any) {
             }
         }
     }
-    console.log(cards);
     assignWords(cards.sort((a, b) => (Number(a.position) > Number(b.position)) ? 1 : -1));
 }
 
@@ -93,6 +83,12 @@ function assignWords(cards: object[]) {
 function checkGameState(gameData: any) {
     // check if game has ended
     if (gameData.gameOver) {
+        // remove listeners on cards
+        let wordCards = document.querySelectorAll(".wordCard.tile");
+        wordCards.forEach(function (wordCard) {
+            let element = <HTMLDivElement>wordCard;
+            element.removeEventListener("click", checkCard);
+        });
         // check if blue won
         if (gameData.blueScore <= 0) {
             document.querySelector(".player-turn").innerHTML = "Victory for Blue!";
@@ -139,10 +135,8 @@ function checkCard(event: MouseEvent) {
     let cardType = card.classList[2];
     let cardWord = card.innerHTML;
     let cardSelection = cardType + " " + cardWord;
-    console.log(cardSelection);
 
-
-
+    
     // Change background color to match cardType selected
     if (cardType == "blue" || cardType == "red") {
         card.style.backgroundColor = cardType;
@@ -163,12 +157,10 @@ function checkCard(event: MouseEvent) {
 
 function spyMasterView() {
     // WIP with Shea
-    console.log("hi")
+    console.log(gameData)
     let cards: NodeListOf<HTMLElement> = document.querySelectorAll(".wordCard");
-    console.log(cards.length)
     cards.forEach(function (card) {
         let cardClasses = card.classList;
-        // console.log(cardClasses);
         card.setAttribute("font-weight", "bold");
         if (cardClasses[0] && cardClasses[1] != "assassin") {
             if (cardClasses[2] == "blue" || cardClasses[2] == "red") {
@@ -188,8 +180,6 @@ function playerView() {
     let cards: NodeListOf<HTMLElement> = document.querySelectorAll(".wordCard");
     cards.forEach(function (card) {
         let cardClasses = card.classList;
-        // console.log(cardClasses);
-
         // need to check for selected cards
         card.style.backgroundColor = "teal";
         card.style.color = "white";
@@ -223,7 +213,8 @@ function createLinkTemplate(linkTemplate: HTMLScriptElement) {
 function createBoardTemplate(boardTemplate: HTMLScriptElement): string {
 
     let div = document.createElement("div");
-    div.className = "wordCard tile{{=index+1}} {{=value['wordCategory']}}";
+    div.className = "wordCard tile {{=value['wordCategory']}} {{=value['status']}}";
+    div.id = "tile{{=index+1}}"
     div.textContent = '{{=value["word"]}}';
     boardTemplate.insertAdjacentText('afterbegin', '{{~it.cards:value:index}}');
     boardTemplate.appendChild(div);
@@ -235,7 +226,6 @@ function createBoardTemplate(boardTemplate: HTMLScriptElement): string {
         return gameId;
     }
     return "";
-
 }
 
 
