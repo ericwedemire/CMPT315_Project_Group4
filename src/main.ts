@@ -48,6 +48,7 @@ function nextGame() {
 }
 
 function skipTurn() {
+    // bug: scoreboard becomes undefined
     socket.send('SKIP');
 }
 
@@ -84,6 +85,10 @@ function assignWords(cards: object[]) {
 function checkGameState(gameData: any) {
     // check if game has ended
     if (gameData.gameOver) {
+        // remove listener on skip button
+        let skipButton = document.querySelector("#btn-skip-turn");
+        skipButton.removeEventListener("click", skipTurn);
+
         // remove listeners on cards
         let wordCards = document.querySelectorAll(".wordCard.tile");
         wordCards.forEach(function (wordCard) {
