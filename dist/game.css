@@ -82,7 +82,7 @@ h1 a {
     gap: 10px;
 }
 
-#btn-player, #btn-spymaster, #btn-next-game {
+#btn-player, #btn-spymaster, #btn-next-game, #btn-skip-turn {
     margin-top: 1em;
     background-color: white;
     font-size: 16px;
