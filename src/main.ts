@@ -157,7 +157,6 @@ function checkCard(event: MouseEvent) {
 
 function spyMasterView() {
     // WIP with Shea
-    console.log(gameData)
     let cards: NodeListOf<HTMLElement> = document.querySelectorAll(".wordCard");
     cards.forEach(function (card) {
         let cardClasses = card.classList;
