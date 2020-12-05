@@ -53,12 +53,12 @@ func databaseUpdate(user User, message string) {
 
 	// changing score; civilian cards alter no points, and so that case will
 	// simply fallthrough to change the turn
-	gameState.RedScore, err = strconv.Atoi(database.HGet(ctx, user.GameID, "score:red").Val())
+	gameState.RedScore, err = strconv.Atoi(database.HGet(ctx, user.GameID, "redScore").Val())
 	if err != nil {
 		log.Println("FAILURE: red score was not understood:", err)
 		return
 	}
-	gameState.BlueScore, err = strconv.Atoi(database.HGet(ctx, user.GameID, "score:blue").Val())
+	gameState.BlueScore, err = strconv.Atoi(database.HGet(ctx, user.GameID, "blueScore").Val())
 	if err != nil {
 		log.Println("FAILURE: blue score was not understood:", err)
 		return
@@ -69,14 +69,14 @@ func databaseUpdate(user User, message string) {
 		if gameState.RedScore == 0 {
 			gameState.GameOver = true
 		}
-		pipeline.Do(ctx, "HSET", user.GameID, "score:red", gameState.RedScore)
+		pipeline.Do(ctx, "HSET", user.GameID, "redScore", gameState.RedScore)
 
 	case "blue":
 		gameState.BlueScore--
 		if gameState.BlueScore == 0 {
 			gameState.GameOver = true
 		}
-		pipeline.Do(ctx, "HSET", user.GameID, "score:blue", gameState.BlueScore)
+		pipeline.Do(ctx, "HSET", user.GameID, "blueScore", gameState.BlueScore)
 
 	case "assassin":
 		gameState.GameOver = true
