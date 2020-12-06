@@ -13,14 +13,14 @@ socket = new WebSocket("ws://localhost:8008/games?id=" + id);
 socket.addEventListener('message', function (event) {
     let gameData = JSON.parse(event.data);
     const board: HTMLDivElement | null = document.querySelector('.board');
-    if (board) {
+    if (gameData.assassin) {
         dealCards(gameData);
+        attachListeners();
+    }
         updateScoreboard(gameData);
         updateView(gameData);
         assignTurn(gameData);
-        attachListeners();
         checkGameState(gameData);
-    }
 });
 
 function createGame() {
@@ -172,6 +172,7 @@ function checkCard(event: MouseEvent) {
     let cardSelection = cardType + " " + cardWord;
 
     // Send the card selected to the backend to be marked selected
+    card.removeEventListener("click", checkCard);
     socket.send(cardSelection);
 }
 
