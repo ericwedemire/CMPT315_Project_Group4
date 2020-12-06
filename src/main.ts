@@ -55,7 +55,6 @@ function skipTurn() {
 function dealCards(gameData: any) {
     let cards: any[] = [];
     let cardTypes = ["assassin", "civilian", "red", "blue"]
-    console.log(gameData);
     for (let [key, value] of Object.entries(gameData)) {
         if (cardTypes.includes(key)) {
             let valueString = value + ""
@@ -155,6 +154,7 @@ function checkCard(event: MouseEvent) {
     let cardType = card.classList[2];
     let cardWord = card.innerHTML;
     let cardSelection = cardType + " " + cardWord;
+    card.classList[3].replace("unselected", "selected");
     // Send the card selected to the backend to be marked selected
     card.removeEventListener("click", checkCard);
     socket.send(cardSelection);

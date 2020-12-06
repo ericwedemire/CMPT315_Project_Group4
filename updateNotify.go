@@ -175,5 +175,6 @@ func alterCardState(gameID string, keyValue []string) string {
 	}
 
 	//replace cardValue with !cardValue for database insertion
-	return strings.Replace(valuesFromKey.Val(), keyValue[1]+" ", " !"+keyValue[1]+" ", 1)
+	return strings.Replace(valuesFromKey.Val(), keyValue[1]+" ", "!"+keyValue[1]+" ", 1)
+	// return strings.Replace(valuesFromKey.Val(), " "+keyValue[1]+" ", " !"+keyValue[1]+" ", 1)
 }
