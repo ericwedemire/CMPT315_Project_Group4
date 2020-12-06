@@ -63,6 +63,8 @@ function dealCards(gameData: any) {
             for (let i = 0; i < words.length; i += 2) {
                 let selected = "";
                 if (words[i].includes("!")) {
+                    // remove exclamation point
+                    words[i] = words[i].slice(1);
                     selected = "selected"
                 }
                 let card = { word: words[i], wordCategory: key, position: words[i + 1], status: selected }
