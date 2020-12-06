@@ -13,14 +13,14 @@ socket = new WebSocket("ws://localhost:8008/games?id=" + id);
 socket.addEventListener('message', function (event) {
     let gameData = JSON.parse(event.data);
     const board: HTMLDivElement | null = document.querySelector('.board');
-    if (board) {
+    if (gameData.assassin) {
         dealCards(gameData);
         attachListeners();
-        updateView(gameData);
+    }
         updateScoreboard(gameData);
+        updateView(gameData);
         assignTurn(gameData);
         checkGameState(gameData);
-    }
 });
 
 function createGame() {
@@ -53,7 +53,6 @@ function skipTurn() {
 }
 
 function dealCards(gameData: any) {
-
     let cards: any[] = [];
     let cardTypes = ["assassin", "civilian", "red", "blue"]
     console.log(gameData);
@@ -61,15 +60,22 @@ function dealCards(gameData: any) {
         if (cardTypes.includes(key)) {
             let valueString = value + ""
             let words = valueString.split(" ");
-            for (let i = 0; i < words.length; i += 2) {
-                let selected = "";
+            for (let i = 0; i < words.length; ) {
+                let selected = "unselected";
                 if (words[i].includes("!")) {
                     // remove exclamation point
                     words[i] = words[i].slice(1);
                     selected = "selected"
                 }
-                let card = { word: words[i], wordCategory: key, position: words[i + 1], status: selected }
-                cards.push(card)
+                if (Number.isInteger(Number(words[i+1]))) {
+                    let card = { word: words[i], wordCategory: key, position: words[i + 1], status: selected }
+                    cards.push(card)
+                    i += 2
+                } else {
+                    let card = { word: words[i] + " " + words[i+1], wordCategory: key, position: words[i + 2], status: selected }
+                    cards.push(card)
+                    i += 3
+                }
             }
         }
     }
@@ -149,8 +155,8 @@ function checkCard(event: MouseEvent) {
     let cardType = card.classList[2];
     let cardWord = card.innerHTML;
     let cardSelection = cardType + " " + cardWord;
-    console.log(cardSelection);
     // Send the card selected to the backend to be marked selected
+    card.removeEventListener("click", checkCard);
     socket.send(cardSelection);
 }
 
