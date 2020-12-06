@@ -11,18 +11,19 @@ const id = path.split("/")[2]
 socket = new WebSocket("ws://localhost:8008/games?id=" + id);
 
 socket.addEventListener('message', function (event) {
-    let gameData = JSON.parse(event.data);
-    const board: HTMLDivElement | null = document.querySelector('.board');
-    console.log(gameData);
+   let gameData = JSON.parse(event.data);
+   const board: HTMLDivElement | null = document.querySelector('.board');
+//    console.log(gameData);
     if (gameData.assassin) {
         dealCards(gameData);
         attachListeners();
     }
-    if (gameData.turn) {
-        assignTurn(gameData);
+    if (gameData.redScore) { 
+        updateView(gameData);
+        checkGameState(gameData);   
+        updateScoreboard(gameData)
     }
-    updateView(gameData);
-    checkGameState(gameData);
+    assignTurn(gameData);   
 });
 
 function createGame() {
@@ -43,14 +44,14 @@ function createGame() {
                 console.log("NAME EXISTS")
             } window.location.assign('/games/' + gameId);
         });
-}
+    }
 
 function nextGame() {
 
 }
 
 function skipTurn() {
-    // bug: scoreboard becomes undefined
+    // bug: scoreboard becomes undefined 
     socket.send('SKIP');
 }
 
@@ -80,10 +81,10 @@ function dealCards(gameData: any) {
             }
         }
     }
-    assignWords(cards.sort((a, b) => (Number(a.position) > Number(b.position)) ? 1 : -1));
+    assignWords(cards.sort((a, b) => (Number(a.position) > Number(b.position)) ? 1 : -1), gameData);
 }
 
-function assignWords(cards: object[]) {
+function assignWords(cards: object[], gameData: any) {
     const tmpl = document.querySelector("#board-template").innerHTML;
     if (tmpl && cards.length != 0) {
         const renderFn = doT.template(tmpl);
@@ -94,6 +95,11 @@ function assignWords(cards: object[]) {
             let element = <HTMLElement>wordCard;
             if (element.classList[3] == "selected") {
                 alterCardStyle(element);
+                
+            } else {
+                if (!gameData.assassin.includes("!")) {
+                    element.addEventListener("click", checkCard);
+                }
             }
         });
     }
@@ -109,9 +115,9 @@ function checkGameState(gameData: any) {
         // remove listeners on cards
         let wordCards = document.querySelectorAll(".wordCard.tile");
         wordCards.forEach(function (wordCard) {
-            let element = <HTMLDivElement>wordCard;
-            element.removeEventListener("click", checkCard);
-        });
+                let element = <HTMLDivElement>wordCard;
+                element.removeEventListener("click", checkCard);
+            });
         // check if blue won
         if (gameData.blueScore <= 0) {
             document.querySelector(".player-turn").innerHTML = "Victory for Blue!";
@@ -144,10 +150,10 @@ function updateScoreboard(gameData: any) {
 }
 
 /* This function is written with the premise that word cards will be made up of 
- * three classes 'word-card unselected color(blue or red)'. If a word card is 
- * unselected, it will be beige. Once selected, the function does an assassin check, 
- * then changes the unselected class to selected, activating the card's color. 
- */
+* three classes 'word-card unselected color(blue or red)'. If a word card is 
+* unselected, it will be beige. Once selected, the function does an assassin check, 
+* then changes the unselected class to selected, activating the card's color. 
+*/
 function checkCard(event: MouseEvent) {
     // Grab div clicked
     let card = event.currentTarget as HTMLElement;
@@ -159,7 +165,7 @@ function checkCard(event: MouseEvent) {
     card.classList.remove("unselected")
     card.classList.add("selected")
     // Send the card selected to the backend to be marked selected
-    card.removeEventListener("click", checkCard);
+    // card.removeEventListener("click", checkCard);
     socket.send(cardSelection);
 }
 
@@ -170,6 +176,7 @@ function updateView(gameData: any) {
         let element = <HTMLElement>wordCard;
         if (element.innerHTML == lastSelection) {
             alterCardStyle(element);
+            element.removeEventListener("click", checkCard);
         }
     });
 
@@ -278,11 +285,11 @@ function attachListeners() {
     if (goBtn) {
         goBtn.addEventListener("click", createGame);
     };
-    let wordCards = document.querySelectorAll(".wordCard");
-    wordCards.forEach(function (wordCard) {
-        let element = <HTMLDivElement>wordCard;
-        element.addEventListener("click", checkCard);
-    });
+    // let wordCards = document.querySelectorAll(".wordCard");
+    // wordCards.forEach(function (wordCard) {
+    //     let element = <HTMLDivElement>wordCard;
+    //     element.addEventListener("click", checkCard);
+    // });
     const spyBtn: HTMLInputElement | null = document.querySelector("#btn-spymaster");
     if (spyBtn) {
         spyBtn.addEventListener("click", spyMasterView);
