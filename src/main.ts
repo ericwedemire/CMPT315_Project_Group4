@@ -55,6 +55,7 @@ function skipTurn() {
 function dealCards(gameData: any) {
     let cards: any[] = [];
     let cardTypes = ["assassin", "civilian", "red", "blue"]
+    console.log(gameData);
     for (let [key, value] of Object.entries(gameData)) {
         if (cardTypes.includes(key)) {
             let valueString = value + ""
@@ -91,23 +92,7 @@ function assignWords(cards: object[]) {
         wordCards.forEach(function (wordCard) {
             let element = <HTMLElement>wordCard;
             if (element.classList[3] == "selected") {
-                switch (element.classList[2]) {
-                    case "blue":
-                        element.style.backgroundColor = "blue";
-                        break;
-                    case "red":
-                        element.style.backgroundColor = "red";
-                        break;
-                    case "assassin":
-                        element.style.backgroundColor = "black";
-                        break;
-                    case "civilian":
-                        element.style.backgroundColor = "yellow";
-                        element.style.color = "black";
-                        break;
-                    default:
-                        return;
-                }
+                alterCardStyle(element);
             }
         });
     }
@@ -170,7 +155,6 @@ function checkCard(event: MouseEvent) {
     let cardType = card.classList[2];
     let cardWord = card.innerHTML;
     let cardSelection = cardType + " " + cardWord;
-
     // Send the card selected to the backend to be marked selected
     card.removeEventListener("click", checkCard);
     socket.send(cardSelection);
@@ -182,24 +166,7 @@ function updateView(gameData: any) {
     wordCards.forEach(function (wordCard) {
         let element = <HTMLElement>wordCard;
         if (element.innerHTML == lastSelection) {
-            // console.log(element.classList[2]);
-            switch (element.classList[2]) {
-                case "blue":
-                    element.style.backgroundColor = "blue";
-                    break;
-                case "red":
-                    element.style.backgroundColor = "red";
-                    break;
-                case "assassin":
-                    element.style.backgroundColor = "black";
-                    break;
-                case "civilian":
-                    element.style.backgroundColor = "yellow";
-                    element.style.color = "black";
-                    break;
-                default:
-                    return;
-            }
+            alterCardStyle(element);
         }
     });
 
@@ -275,6 +242,26 @@ function createBoardTemplate(boardTemplate: HTMLScriptElement): string {
         return gameId;
     }
     return "";
+}
+
+function alterCardStyle(element: HTMLElement) {
+    switch (element.classList[2]) {
+        case "blue":
+            element.style.backgroundColor = "blue";
+            break;
+        case "red":
+            element.style.backgroundColor = "red";
+            break;
+        case "assassin":
+            element.style.backgroundColor = "black";
+            break;
+        case "civilian":
+            element.style.backgroundColor = "yellow";
+            element.style.color = "black";
+            break;
+        default:
+            return;
+    }
 }
 
 

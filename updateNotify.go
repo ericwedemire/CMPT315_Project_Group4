@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -39,6 +40,7 @@ func databaseUpdate(user User, message string) {
 	if alterResult == "" {
 		return
 	}
+	fmt.Printf(alterResult)
 
 	turn := database.HGet(ctx, user.GameID, "turn").Val()
 
@@ -173,5 +175,5 @@ func alterCardState(gameID string, keyValue []string) string {
 	}
 
 	//replace cardValue with !cardValue for database insertion
-	return strings.Replace(valuesFromKey.Val(), " "+keyValue[1]+" ", " !"+keyValue[1]+" ", 1)
+	return strings.Replace(valuesFromKey.Val(), keyValue[1]+" ", " !"+keyValue[1]+" ", 1)
 }
