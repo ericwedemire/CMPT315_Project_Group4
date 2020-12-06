@@ -11,19 +11,19 @@ const id = path.split("/")[2]
 socket = new WebSocket("ws://localhost:8008/games?id=" + id);
 
 socket.addEventListener('message', function (event) {
-   let gameData = JSON.parse(event.data);
-   const board: HTMLDivElement | null = document.querySelector('.board');
-//    console.log(gameData);
+    let gameData = JSON.parse(event.data);
+    const board: HTMLDivElement | null = document.querySelector('.board');
+    //    console.log(gameData);
     if (gameData.assassin) {
         dealCards(gameData);
         attachListeners();
     }
-    if (gameData.redScore) { 
+    if (gameData.redScore) {
         updateView(gameData);
-        checkGameState(gameData);   
         updateScoreboard(gameData)
     }
-    assignTurn(gameData);   
+    assignTurn(gameData);
+    checkGameState(gameData);
 });
 
 function createGame() {
@@ -44,7 +44,7 @@ function createGame() {
                 console.log("NAME EXISTS")
             } window.location.assign('/games/' + gameId);
         });
-    }
+}
 
 function nextGame() {
 
@@ -95,7 +95,7 @@ function assignWords(cards: object[], gameData: any) {
             let element = <HTMLElement>wordCard;
             if (element.classList[3] == "selected") {
                 alterCardStyle(element);
-                
+
             } else {
                 if (!gameData.assassin.includes("!")) {
                     element.addEventListener("click", checkCard);
@@ -115,9 +115,9 @@ function checkGameState(gameData: any) {
         // remove listeners on cards
         let wordCards = document.querySelectorAll(".wordCard.tile");
         wordCards.forEach(function (wordCard) {
-                let element = <HTMLDivElement>wordCard;
-                element.removeEventListener("click", checkCard);
-            });
+            let element = <HTMLDivElement>wordCard;
+            element.removeEventListener("click", checkCard);
+        });
         // check if blue won
         if (gameData.blueScore <= 0) {
             document.querySelector(".player-turn").innerHTML = "Victory for Blue!";
