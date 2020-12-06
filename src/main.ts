@@ -16,6 +16,7 @@ socket.addEventListener('message', function (event) {
     if (board) {
         dealCards(gameData);
         updateScoreboard(gameData);
+        updateView(gameData);
         assignTurn(gameData);
         attachListeners();
         checkGameState(gameData);
@@ -47,24 +48,33 @@ function nextGame() {
 }
 
 function skipTurn() {
+    // bug: scoreboard becomes undefined
     socket.send('SKIP');
 }
 
 function dealCards(gameData: any) {
-
     let cards: any[] = [];
     let cardTypes = ["assassin", "civilian", "red", "blue"]
     for (let [key, value] of Object.entries(gameData)) {
         if (cardTypes.includes(key)) {
             let valueString = value + ""
             let words = valueString.split(" ");
-            for (let i = 0; i < words.length; i += 2) {
-                let selected = "";
+            for (let i = 0; i < words.length; ) {
+                let selected = "unselected";
                 if (words[i].includes("!")) {
+                    // remove exclamation point
+                    words[i] = words[i].slice(1);
                     selected = "selected"
                 }
-                let card = { word: words[i], wordCategory: key, position: words[i + 1], status: selected }
-                cards.push(card)
+                if (Number.isInteger(Number(words[i+1]))) {
+                    let card = { word: words[i], wordCategory: key, position: words[i + 1], status: selected }
+                    cards.push(card)
+                    i += 2
+                } else {
+                    let card = { word: words[i] + " " + words[i+1], wordCategory: key, position: words[i + 2], status: selected }
+                    cards.push(card)
+                    i += 3
+                }
             }
         }
     }
@@ -77,12 +87,39 @@ function assignWords(cards: object[]) {
         const renderFn = doT.template(tmpl);
         const renderResult = renderFn({ "cards": cards });
         document.querySelector(".board").innerHTML = renderResult;
+        let wordCards = document.querySelectorAll(".wordCard");
+        wordCards.forEach(function (wordCard) {
+            let element = <HTMLElement>wordCard;
+            if (element.classList[3] == "selected") {
+                switch (element.classList[2]) {
+                    case "blue":
+                        element.style.backgroundColor = "blue";
+                        break;
+                    case "red":
+                        element.style.backgroundColor = "red";
+                        break;
+                    case "assassin":
+                        element.style.backgroundColor = "black";
+                        break;
+                    case "civilian":
+                        element.style.backgroundColor = "yellow";
+                        element.style.color = "black";
+                        break;
+                    default:
+                        return;
+                }
+            }
+        });
     }
 }
 
 function checkGameState(gameData: any) {
     // check if game has ended
     if (gameData.gameOver) {
+        // remove listener on skip button
+        let skipButton = document.querySelector("#btn-skip-turn");
+        skipButton.removeEventListener("click", skipTurn);
+
         // remove listeners on cards
         let wordCards = document.querySelectorAll(".wordCard.tile");
         wordCards.forEach(function (wordCard) {
@@ -129,30 +166,42 @@ function checkCard(event: MouseEvent) {
     // Grab div clicked
     let card = event.currentTarget as HTMLElement;
 
-    // let currentTile = card.classList[1];
-
     // Format card to "cardType cardWord" so the API can understand and respond appropriately
     let cardType = card.classList[2];
     let cardWord = card.innerHTML;
     let cardSelection = cardType + " " + cardWord;
 
-    
-    // Change background color to match cardType selected
-    if (cardType == "blue" || cardType == "red") {
-        card.style.backgroundColor = cardType;
-    }
-
-    else if (cardType == "assassin") {
-        card.style.backgroundColor = "black";
-    }
-
-    else if (cardType == "civilian") {
-        card.style.backgroundColor = "yellow";
-        card.style.color = "black";
-    }
-
     // Send the card selected to the backend to be marked selected
     socket.send(cardSelection);
+}
+
+function updateView(gameData: any) {
+    let lastSelection = gameData.lastSelection;
+    let wordCards = document.querySelectorAll(".wordCard");
+    wordCards.forEach(function (wordCard) {
+        let element = <HTMLElement>wordCard;
+        if (element.innerHTML == lastSelection) {
+            // console.log(element.classList[2]);
+            switch (element.classList[2]) {
+                case "blue":
+                    element.style.backgroundColor = "blue";
+                    break;
+                case "red":
+                    element.style.backgroundColor = "red";
+                    break;
+                case "assassin":
+                    element.style.backgroundColor = "black";
+                    break;
+                case "civilian":
+                    element.style.backgroundColor = "yellow";
+                    element.style.color = "black";
+                    break;
+                default:
+                    return;
+            }
+        }
+    });
+
 }
 
 function spyMasterView() {
@@ -253,7 +302,7 @@ function attachListeners() {
 
     const skipBtn: HTMLInputElement | null = document.querySelector("#btn-skip-turn");
     if (skipBtn) {
-        skipBtn?.addEventListener("click", skipTurn);
+        skipBtn.addEventListener("click", skipTurn);
     }
     const linkTemp: HTMLScriptElement | null = document.querySelector("#link-container-template");
     if (linkTemp) { createLinkTemplate(linkTemp) }
