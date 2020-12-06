@@ -74,8 +74,8 @@ func createGame(writer http.ResponseWriter, request *http.Request) {
 	assassin := words[len(words)-1]
 
 	vals := map[string]interface{}{
-		"blueScore": redScore,
-		"redScore":  blueScore,
+		"blueScore": blueScore,
+		"redScore":  redScore,
 		"turn":      turn,
 		"red":       strings.Join(redCards, " "),
 		"blue":      strings.Join(blueCards, " "),
