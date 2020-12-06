@@ -81,6 +81,29 @@ function assignWords(cards: object[]) {
         const renderFn = doT.template(tmpl);
         const renderResult = renderFn({ "cards": cards });
         document.querySelector(".board").innerHTML = renderResult;
+        let wordCards = document.querySelectorAll(".wordCard");
+        wordCards.forEach(function (wordCard) {
+            let element = <HTMLElement>wordCard;
+            if (element.classList[3] == "selected") {
+                switch (element.classList[2]) {
+                    case "blue":
+                        element.style.backgroundColor = "blue";
+                        break;
+                    case "red":
+                        element.style.backgroundColor = "red";
+                        break;
+                    case "assassin":
+                        element.style.backgroundColor = "black";
+                        break;
+                    case "civilian":
+                        element.style.backgroundColor = "yellow";
+                        element.style.color = "black";
+                        break;
+                    default:
+                        return;
+                }
+            }
+        });
     }
 }
 
