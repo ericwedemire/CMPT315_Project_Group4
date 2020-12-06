@@ -18,7 +18,7 @@ socket.addEventListener('message', function (event) {
         dealCards(gameData);
         attachListeners();
     }
-    if (gameData.turn) { 
+    if (gameData.turn) {
         assignTurn(gameData);
     }
     updateView(gameData);
@@ -61,19 +61,19 @@ function dealCards(gameData: any) {
         if (cardTypes.includes(key)) {
             let valueString = value + ""
             let words = valueString.split(" ");
-            for (let i = 0; i < words.length; ) {
+            for (let i = 0; i < words.length;) {
                 let selected = "unselected";
                 if (words[i].includes("!")) {
                     // remove exclamation point
                     words[i] = words[i].slice(1);
                     selected = "selected"
                 }
-                if (Number.isInteger(Number(words[i+1]))) {
+                if (Number.isInteger(Number(words[i + 1]))) {
                     let card = { word: words[i], wordCategory: key, position: words[i + 1], status: selected }
                     cards.push(card)
                     i += 2
                 } else {
-                    let card = { word: words[i] + " " + words[i+1], wordCategory: key, position: words[i + 2], status: selected }
+                    let card = { word: words[i] + " " + words[i + 1], wordCategory: key, position: words[i + 2], status: selected }
                     cards.push(card)
                     i += 3
                 }
@@ -199,9 +199,14 @@ function playerView() {
     let cards: NodeListOf<HTMLElement> = document.querySelectorAll(".wordCard");
     cards.forEach(function (card) {
         let cardClasses = card.classList;
-        // need to check for selected cards
-        card.style.backgroundColor = "teal";
-        card.style.color = "white";
+        if (cardClasses[3] == "selected") {
+            alterCardStyle(card);
+        }
+        else {
+            // need to check for selected cards
+            card.style.backgroundColor = "teal";
+            card.style.color = "white";
+        }
     });
 }
 
