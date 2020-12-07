@@ -57,6 +57,7 @@ h1 a {
 
 .wordCard {
     display:    flex;
+    border-radius: 10px;
     justify-content: center;
     align-items: center;
     height: 100px;

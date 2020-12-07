@@ -259,16 +259,16 @@ function createBoardTemplate(boardTemplate: HTMLScriptElement): string {
 function alterCardStyle(element: HTMLElement) {
     switch (element.classList[2]) {
         case "blue":
-            element.style.backgroundColor = "blue";
+            element.style.backgroundColor = 'rgb(' + 66 + ',' + 138 + ',' + 245 + ')';
             break;
         case "red":
-            element.style.backgroundColor = "red";
+            element.style.backgroundColor = 'rgb(' + 245 + ',' + 90 + ',' + 66 + ')';
             break;
         case "assassin":
-            element.style.backgroundColor = "black";
+            element.style.backgroundColor = 'rgb(' + 50 + ',' + 50 + ',' + 50 + ')';
             break;
         case "civilian":
-            element.style.backgroundColor = "yellow";
+            element.style.backgroundColor = 'rgb(' + 215 + ',' + 195 + ',' + 150 + ')';
             element.style.color = "black";
             break;
         default:
