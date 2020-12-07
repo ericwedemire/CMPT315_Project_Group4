@@ -18,10 +18,12 @@ socket.addEventListener('message', function (event) {
         // ##############################
     }
     
+    //joining game, assassin field only appears here
     if (gameData.assassin) {
         dealCards(gameData);
         attachListeners();
     }
+    //server sends update after card selection
     if (gameData.redScore) {
         updateView(gameData);
         updateScoreboard(gameData)
@@ -111,7 +113,7 @@ function assignWords(cards: object[], gameData: any) {
 
 function checkGameState(gameData: any) {
     // check if game has ended
-    if (gameData.gameOver) {
+    if (gameData.gameover === "true") {
         // remove listener on skip button
         let skipButton = document.querySelector("#btn-skip-turn");
         skipButton.removeEventListener("click", skipTurn);

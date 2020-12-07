@@ -70,12 +70,12 @@ func databaseUpdate(user User, message string) {
 
 	// changing score; civilian cards alter no points, and so that case will
 	// simply fallthrough to change the turn
-	gameState.RedScore, err = strconv.Atoi(database.HGet(ctx, user.GameID, "redScore").Val())
+	gameState.RedScore, err = strconv.Atoi(database.HGet(ctx, user.GameID, "red:score").Val())
 	if err != nil {
 		log.Println("FAILURE: red score was not understood:", err)
 		return
 	}
-	gameState.BlueScore, err = strconv.Atoi(database.HGet(ctx, user.GameID, "blueScore").Val())
+	gameState.BlueScore, err = strconv.Atoi(database.HGet(ctx, user.GameID, "blue:score").Val())
 	if err != nil {
 		log.Println("FAILURE: blue score was not understood:", err)
 		return
@@ -85,18 +85,21 @@ func databaseUpdate(user User, message string) {
 		gameState.RedScore--
 		if gameState.RedScore == 0 {
 			gameState.GameOver = true
+			pipeline.Do(ctx, "HSET", user.GameID, "gameover", "true")
 		}
-		pipeline.Do(ctx, "HSET", user.GameID, "redScore", gameState.RedScore)
+		pipeline.Do(ctx, "HSET", user.GameID, "red:score", gameState.RedScore)
 
 	case "blue":
 		gameState.BlueScore--
 		if gameState.BlueScore == 0 {
 			gameState.GameOver = true
+			pipeline.Do(ctx, "HSET", user.GameID, "gameover", "true")
 		}
-		pipeline.Do(ctx, "HSET", user.GameID, "blueScore", gameState.BlueScore)
+		pipeline.Do(ctx, "HSET", user.GameID, "blue:score", gameState.BlueScore)
 
 	case "assassin":
 		gameState.GameOver = true
+		pipeline.Do(ctx, "HSET", user.GameID, "gameover", "true")
 	}
 
 	// turn change only if card colour did not match turn colour
@@ -161,13 +164,14 @@ func nextGame(gameID string) {
 	assassin := words[len(words)-1]
 
 	vals := map[string]interface{}{
-		"blueScore": blueScore,
-		"redScore":  redScore,
-		"turn":      turn,
-		"red":       strings.Join(redCards, " "),
-		"blue":      strings.Join(blueCards, " "),
-		"assassin":  assassin,
-		"civilian":  strings.Join(civCards, " "),
+		"blue:score": blueScore,
+		"red:score":  redScore,
+		"turn":       turn,
+		"red":        strings.Join(redCards, " "),
+		"blue":       strings.Join(blueCards, " "),
+		"assassin":   assassin,
+		"civilian":   strings.Join(civCards, " "),
+		"gameover":   "false",
 	}
 	database.HSet(ctx, gameID, vals)
 
@@ -215,7 +219,7 @@ func skipTurn(gameID string) {
 // 	"redScore": int,
 // 	"blueScore": int,
 // 	"turn": string,
-// 	"gameOver": bool
+// 	"gameover": bool
 // }
 //
 func notify(gameID string, status interface{}) {
@@ -245,5 +249,4 @@ func alterCardState(gameID string, keyValue []string) string {
 
 	//replace cardValue with !cardValue for database insertion
 	return strings.Replace(valuesFromKey.Val(), keyValue[1]+" ", "!"+keyValue[1]+" ", 1)
-	// return strings.Replace(valuesFromKey.Val(), " "+keyValue[1]+" ", " !"+keyValue[1]+" ", 1)
 }
