@@ -168,6 +168,7 @@ function checkCard(event: MouseEvent) {
 }
 
 function updateView(gameData: any) {
+    console.log(gameData)
     let lastSelection = gameData.lastSelection;
     let wordCards = document.querySelectorAll(".wordCard");
     wordCards.forEach(function (wordCard) {
@@ -187,13 +188,15 @@ function spyMasterView() {
         let cardClasses = card.classList;
         card.setAttribute("font-weight", "bold");
         if (cardClasses[0] && cardClasses[1] != "assassin") {
-            if (cardClasses[2] == "blue" || cardClasses[2] == "red") {
-                card.style.backgroundColor = cardClasses[2];
+            if (cardClasses[2] == "blue")  {
+                card.style.backgroundColor = 'rgb(' + 66 + ',' + 138 + ',' + 245 + ')';
+            } else if (cardClasses[2] == "red") {
+                card.style.backgroundColor = 'rgb(' + 245 + ',' + 90 + ',' + 66 + ')';
             } else if (cardClasses[2] == "civilian") {
                 card.style.color = "black";
-                card.style.backgroundColor = "yellow";
+                card.style.backgroundColor = 'rgb(' + 215 + ',' + 195 + ',' + 150 + ')';
             } else {
-                card.style.backgroundColor = "black";
+                card.style.backgroundColor = 'rgb(' + 50 + ',' + 50 + ',' + 50 + ')';
             }
         }
     });
