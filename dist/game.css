@@ -72,9 +72,9 @@ h1 a {
   font-family: Verdana, Geneva, sans-serif;
 }
 
-.wordCard:hover {
+.board > .unselected:hover {
   border-radius: 25px;
-  background-color: #8bbb8b;
+  background-color: #8bbb8b !important;
 }
 
 .btn-container {
@@ -89,11 +89,14 @@ h1 a {
 #btn-next-game,
 #btn-skip-turn {
   margin-top: 1em;
-  background-color: white;
+  background-color: #bc412b;
   font-size: 16px;
+  font-weight: 900;
   padding: 7px 32px;
-  border: 3px solid;
+  border: none;
+  box-shadow: inset 0 -0.6em 0 -0.35em rgba(0, 0, 0, 0.17);
   text-transform: uppercase;
+  position: relative;
 }
 
 #btn-player:hover,
@@ -102,5 +105,12 @@ h1 a {
 #btn-skip-turn:hover {
   font-weight: 900;
   color: white;
-  background-color: rgb(14, 106, 243);
+}
+
+#btn-player:active,
+#btn-spymaster:active,
+#btn-next-game:active,
+#btn-skip-turn:active {
+  border: none;
+  top: 0.1em;
 }
