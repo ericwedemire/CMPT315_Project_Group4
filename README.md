@@ -65,7 +65,7 @@ When the server is updating a client after a card selection has been made, clien
         "redScore": int,
         "blueScore": int,
         "turn": string,
-        "gameOver": bool
+        "gameover": "false"|"true"
     } 
 ```
 
@@ -87,7 +87,7 @@ Upon joining a game with a WebSocket connection, the server with reply with the 
         "blueScore": int,
         "redScore": int,
         "turn": "red"|"blue"
-        "gameOver": bool
+        "gameover": "false"|"true"
     }
 ```
 
