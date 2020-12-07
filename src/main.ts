@@ -14,6 +14,7 @@ socket.addEventListener('message', function (event) {
     let gameData = JSON.parse(event.data);
     const board: HTMLDivElement | null = document.querySelector('.board');
     if (gameData.status) {
+        // redirect to 404 page
         console.log(gameData, "not found") 
         // ##############################
     }
