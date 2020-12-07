@@ -13,7 +13,6 @@ socket = new WebSocket("ws://localhost:8008/games?id=" + id);
 socket.addEventListener('message', function (event) {
     let gameData = JSON.parse(event.data);
     const board: HTMLDivElement | null = document.querySelector('.board');
-    //    console.log(gameData);
     if (gameData.assassin) {
         dealCards(gameData);
         attachListeners();
@@ -90,7 +89,7 @@ function assignWords(cards: object[], gameData: any) {
         const renderFn = doT.template(tmpl);
         const renderResult = renderFn({ "cards": cards });
         document.querySelector(".board").innerHTML = renderResult;
-        let wordCards = document.querySelectorAll(".wordCard");
+        let wordCards = document.querySelectorAll(".board .wordCard");
         wordCards.forEach(function (wordCard) {
             let element = <HTMLElement>wordCard;
             if (element.classList[3] == "selected") {
@@ -113,7 +112,7 @@ function checkGameState(gameData: any) {
         skipButton.removeEventListener("click", skipTurn);
 
         // remove listeners on cards
-        let wordCards = document.querySelectorAll(".wordCard.tile");
+        let wordCards = document.querySelectorAll(".board .wordCard.tile");
         wordCards.forEach(function (wordCard) {
             let element = <HTMLDivElement>wordCard;
             element.removeEventListener("click", checkCard);
@@ -165,7 +164,6 @@ function checkCard(event: MouseEvent) {
     card.classList.remove("unselected")
     card.classList.add("selected")
     // Send the card selected to the backend to be marked selected
-    // card.removeEventListener("click", checkCard);
     socket.send(cardSelection);
 }
 
@@ -184,7 +182,7 @@ function updateView(gameData: any) {
 
 function spyMasterView() {
     // WIP with Shea
-    let cards: NodeListOf<HTMLElement> = document.querySelectorAll(".wordCard");
+    let cards: NodeListOf<HTMLElement> = document.querySelectorAll(".board .wordCard");
     cards.forEach(function (card) {
         let cardClasses = card.classList;
         card.setAttribute("font-weight", "bold");
@@ -203,7 +201,7 @@ function spyMasterView() {
 
 function playerView() {
     // WIP with Shea
-    let cards: NodeListOf<HTMLElement> = document.querySelectorAll(".wordCard");
+    let cards: NodeListOf<HTMLElement> = document.querySelectorAll(".board .wordCard");
     cards.forEach(function (card) {
         let cardClasses = card.classList;
         if (cardClasses[3] == "selected") {
@@ -250,7 +248,6 @@ function createBoardTemplate(boardTemplate: HTMLScriptElement): string {
     boardTemplate.insertAdjacentText('afterbegin', '{{~it.cards:value:index}}');
     boardTemplate.appendChild(div);
     boardTemplate.insertAdjacentText('beforeend', '{{~}}');
-
     let gameBody = document.querySelector("body");
     if (gameBody) {
         let gameId = gameBody.id;
@@ -285,11 +282,6 @@ function attachListeners() {
     if (goBtn) {
         goBtn.addEventListener("click", createGame);
     };
-    // let wordCards = document.querySelectorAll(".wordCard");
-    // wordCards.forEach(function (wordCard) {
-    //     let element = <HTMLDivElement>wordCard;
-    //     element.addEventListener("click", checkCard);
-    // });
     const spyBtn: HTMLInputElement | null = document.querySelector("#btn-spymaster");
     if (spyBtn) {
         spyBtn.addEventListener("click", spyMasterView);
@@ -307,6 +299,9 @@ function attachListeners() {
     if (skipBtn) {
         skipBtn.addEventListener("click", skipTurn);
     }
+}
+
+function createTemplates() {
     const linkTemp: HTMLScriptElement | null = document.querySelector("#link-container-template");
     if (linkTemp) { createLinkTemplate(linkTemp) }
 
@@ -317,4 +312,5 @@ function attachListeners() {
     }
 }
 
+createTemplates();
 attachListeners();
