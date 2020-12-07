@@ -10,6 +10,11 @@ body {
     gap: 10px;
 }
 
+.board>.unselected:hover {
+    border-radius: 25px;
+    background-color: #8bbb8b !important;
+}
+
 h1 {
     color: #264653;
     font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
