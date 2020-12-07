@@ -21,13 +21,6 @@ func newSocketConnection(writer http.ResponseWriter, request *http.Request) {
 	vars := mux.Vars(request)
 	gameID := vars["gameID"]
 
-	currentGame := activeGames[gameID]
-	if currentGame == nil {
-		message := "No current game called: " + gameID + " exists"
-		encodeAndSendError(writer, request, http.StatusBadRequest, message)
-		return
-	}
-
 	//creating WebSocket
 	log.Println("Attempting new client WebSocket creation for game:", gameID)
 	newUser.Connection, err = upgrader.Upgrade(writer, request, nil)
@@ -37,6 +30,20 @@ func newSocketConnection(writer http.ResponseWriter, request *http.Request) {
 		return
 	}
 	newUser.GameID = gameID
+	currentGame := activeGames[gameID]
+	if currentGame == nil {
+		var errorState ErrorState
+		errorState.Status = "404 No current game called " + gameID
+		message, err := json.Marshal(errorState)
+		if err != nil {
+			message := "Could not encode fail status into JSON:" + err.Error()
+			encodeAndSendError(writer, request, http.StatusBadRequest, message)
+			return
+		}
+		newUser.Connection.WriteMessage(1, message)
+		//encodeAndSendError(writer, request, http.StatusBadRequest, message)
+		return
+	}
 
 	currentGame.Connections = append(currentGame.Connections, newUser)
 
