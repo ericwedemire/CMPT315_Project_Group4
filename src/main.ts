@@ -15,7 +15,7 @@ socket.addEventListener('message', function (event) {
     const board: HTMLDivElement | null = document.querySelector('.board');
     if (gameData.status) {
         // redirect to 404 page
-        console.log(gameData, "not found") 
+        console.log(gameData, "not found")
         // ##############################
     }
     
@@ -100,6 +100,9 @@ function assignWords(cards: object[], gameData: any) {
         let wordCards = document.querySelectorAll(".board .wordCard");
         wordCards.forEach(function (wordCard) {
             let element = <HTMLElement>wordCard;
+            
+            //add hover styling
+            element.classList.add("playerView")
             if (element.classList[3] == "selected") {
                 alterCardStyle(element);
 
@@ -191,38 +194,39 @@ function updateView(gameData: any) {
 }
 
 function spyMasterView() {
-    // WIP with Shea
     let cards: NodeListOf<HTMLElement> = document.querySelectorAll(".board .wordCard");
     cards.forEach(function (card) {
         let cardClasses = card.classList;
+        card.classList.remove("playerView")
         card.setAttribute("font-weight", "bold");
         if (cardClasses[0] && cardClasses[1] != "assassin") {
             if (cardClasses[2] == "blue")  {
-                card.style.backgroundColor = 'rgb(' + 66 + ',' + 138 + ',' + 245 + ')';
+                card.classList.add("spymasterBlue")
             } else if (cardClasses[2] == "red") {
-                card.style.backgroundColor = 'rgb(' + 245 + ',' + 90 + ',' + 66 + ')';
+                card.classList.add("spymasterRed")
             } else if (cardClasses[2] == "civilian") {
-                card.style.color = "black";
-                card.style.backgroundColor = 'rgb(' + 215 + ',' + 195 + ',' + 150 + ')';
+                card.classList.add("spymasterCivilian")
             } else {
-                card.style.backgroundColor = 'rgb(' + 50 + ',' + 50 + ',' + 50 + ')';
+                card.classList.add("spymasterAssassin")
             }
         }
     });
 }
 
 function playerView() {
-    // WIP with Shea
     let cards: NodeListOf<HTMLElement> = document.querySelectorAll(".board .wordCard");
     cards.forEach(function (card) {
+        card.classList.remove("spymasterBlue")
+        card.classList.remove("spymasterRed")
+        card.classList.remove("spymasterCivilian")
+        card.classList.remove("spymasterAssassin")
         let cardClasses = card.classList;
         if (cardClasses[3] == "selected") {
             alterCardStyle(card);
         }
         else {
-            // need to check for selected cards
-            card.style.backgroundColor = "teal";
-            card.style.color = "white";
+            //add hover css back
+            card.classList.add("playerView")
         }
     });
 }
