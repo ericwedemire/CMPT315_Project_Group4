@@ -35,7 +35,7 @@ type GameState struct {
 	RedScore      int    `json:"redScore"`
 	BlueScore     int    `json:"blueScore"`
 	Turn          string `json:"turn"`
-	GameOver      bool   `json:"gameover"`
+	GameOver      string `json:"gameover"`
 }
 
 // TurnState is used to pass updates to client connections everytime a word is

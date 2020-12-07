@@ -84,7 +84,7 @@ func databaseUpdate(user User, message string) {
 	case "red":
 		gameState.RedScore--
 		if gameState.RedScore == 0 {
-			gameState.GameOver = true
+			gameState.GameOver = "true"
 			pipeline.Do(ctx, "HSET", user.GameID, "gameover", "true")
 		}
 		pipeline.Do(ctx, "HSET", user.GameID, "red:score", gameState.RedScore)
@@ -92,13 +92,13 @@ func databaseUpdate(user User, message string) {
 	case "blue":
 		gameState.BlueScore--
 		if gameState.BlueScore == 0 {
-			gameState.GameOver = true
+			gameState.GameOver = "true"
 			pipeline.Do(ctx, "HSET", user.GameID, "gameover", "true")
 		}
 		pipeline.Do(ctx, "HSET", user.GameID, "blue:score", gameState.BlueScore)
 
 	case "assassin":
-		gameState.GameOver = true
+		gameState.GameOver = "true"
 		pipeline.Do(ctx, "HSET", user.GameID, "gameover", "true")
 	}
 

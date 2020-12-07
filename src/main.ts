@@ -24,7 +24,7 @@ socket.addEventListener('message', function (event) {
         attachListeners();
     }
     //server sends update after card selection
-    if (gameData.redScore) {
+    if (gameData.blueScore || gameData.redScore) {
         updateView(gameData);
         updateScoreboard(gameData)
     }
@@ -114,16 +114,7 @@ function assignWords(cards: object[], gameData: any) {
 function checkGameState(gameData: any) {
     // check if game has ended
     if (gameData.gameover === "true") {
-        // remove listener on skip button
-        let skipButton = document.querySelector("#btn-skip-turn");
-        skipButton.removeEventListener("click", skipTurn);
 
-        // remove listeners on cards
-        let wordCards = document.querySelectorAll(".board .wordCard.tile");
-        wordCards.forEach(function (wordCard) {
-            let element = <HTMLDivElement>wordCard;
-            element.removeEventListener("click", checkCard);
-        });
         // check if blue won
         if (gameData.blueScore <= 0) {
             document.querySelector(".player-turn").innerHTML = "Victory for Blue!";
@@ -138,6 +129,17 @@ function checkGameState(gameData: any) {
             let winner = document.querySelector(".player-turn").innerHTML.slice(0, -7);
             document.querySelector(".player-turn").innerHTML = "Victory for " + winner + "!";
         }
+        
+        // remove listener on skip button
+        let skipButton = document.querySelector("#btn-skip-turn");
+        skipButton.removeEventListener("click", skipTurn);
+
+        // remove listeners on cards
+        let wordCards = document.querySelectorAll(".board .wordCard.tile");
+        wordCards.forEach(function (wordCard) {
+            let element = <HTMLDivElement>wordCard;
+            element.removeEventListener("click", checkCard);
+        });
     }
 }
 
