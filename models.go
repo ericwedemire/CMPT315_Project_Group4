@@ -44,6 +44,11 @@ type TurnState struct {
 	Turn string `json:"turn"`
 }
 
+// ErrorState is used to notify socket connections that a game is not found.
+type ErrorState struct {
+	Status string `json:"status"`
+}
+
 // activeGames keeps a record of all active game sessions
 var activeGames map[string]*Game = make(map[string]*Game)
 
