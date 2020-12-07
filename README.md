@@ -85,8 +85,8 @@ the full game state of all relevant information structured as:
         "blue": space-seperated words,
         "civilian": space-seperated words,
         "red": space-seperated words,
-        "score:blue": int,
-        "score:red": int,
+        "blueScore": int,
+        "redScore": int,
         "turn": "red"|"blue"
     }
 ```
