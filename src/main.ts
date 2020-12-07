@@ -13,8 +13,8 @@ socket = new WebSocket("ws://localhost:8008/games?id=" + id);
 socket.addEventListener('message', function (event) {
     let gameData = JSON.parse(event.data);
     const board: HTMLDivElement | null = document.querySelector('.board');
-    console.log(gameData) 
     if (gameData.status) {
+        // redirect to 404 page
         console.log(gameData, "not found") 
         // ##############################
     }
@@ -49,7 +49,6 @@ function createGame() {
     fetch(apiCall)
         .then(response => {
             if (response.status === 400) {
-                console.log("NAME EXISTS")
             } window.location.assign('/games/' + gameId);
         });
 }
@@ -179,7 +178,6 @@ function checkCard(event: MouseEvent) {
 }
 
 function updateView(gameData: any) {
-    console.log(gameData)
     let lastSelection = gameData.lastSelection;
     let wordCards = document.querySelectorAll(".wordCard");
     wordCards.forEach(function (wordCard) {
