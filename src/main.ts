@@ -13,6 +13,7 @@ socket = new WebSocket("ws://localhost:8008/games?id=" + id);
 socket.addEventListener('message', function (event) {
     let gameData = JSON.parse(event.data);
     const board: HTMLDivElement | null = document.querySelector('.board');
+    console.log(gameData) 
     if (gameData.status) {
         console.log(gameData, "not found") 
         // ##############################
@@ -21,6 +22,7 @@ socket.addEventListener('message', function (event) {
     //joining game, assassin field only appears here
     if (gameData.assassin) {
         dealCards(gameData);
+        updateScoreboard(gameData);
         attachListeners();
     }
     //server sends update after card selection

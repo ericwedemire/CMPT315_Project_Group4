@@ -70,12 +70,12 @@ func databaseUpdate(user User, message string) {
 
 	// changing score; civilian cards alter no points, and so that case will
 	// simply fallthrough to change the turn
-	gameState.RedScore, err = strconv.Atoi(database.HGet(ctx, user.GameID, "red:score").Val())
+	gameState.RedScore, err = strconv.Atoi(database.HGet(ctx, user.GameID, "redScore").Val())
 	if err != nil {
 		log.Println("FAILURE: red score was not understood:", err)
 		return
 	}
-	gameState.BlueScore, err = strconv.Atoi(database.HGet(ctx, user.GameID, "blue:score").Val())
+	gameState.BlueScore, err = strconv.Atoi(database.HGet(ctx, user.GameID, "blueScore").Val())
 	if err != nil {
 		log.Println("FAILURE: blue score was not understood:", err)
 		return
@@ -87,7 +87,7 @@ func databaseUpdate(user User, message string) {
 			gameState.GameOver = "true"
 			pipeline.Do(ctx, "HSET", user.GameID, "gameover", "true")
 		}
-		pipeline.Do(ctx, "HSET", user.GameID, "red:score", gameState.RedScore)
+		pipeline.Do(ctx, "HSET", user.GameID, "redScore", gameState.RedScore)
 
 	case "blue":
 		gameState.BlueScore--
@@ -95,7 +95,7 @@ func databaseUpdate(user User, message string) {
 			gameState.GameOver = "true"
 			pipeline.Do(ctx, "HSET", user.GameID, "gameover", "true")
 		}
-		pipeline.Do(ctx, "HSET", user.GameID, "blue:score", gameState.BlueScore)
+		pipeline.Do(ctx, "HSET", user.GameID, "blueScore", gameState.BlueScore)
 
 	case "assassin":
 		gameState.GameOver = "true"
@@ -164,14 +164,14 @@ func nextGame(gameID string) {
 	assassin := words[len(words)-1]
 
 	vals := map[string]interface{}{
-		"blue:score": blueScore,
-		"red:score":  redScore,
-		"turn":       turn,
-		"red":        strings.Join(redCards, " "),
-		"blue":       strings.Join(blueCards, " "),
-		"assassin":   assassin,
-		"civilian":   strings.Join(civCards, " "),
-		"gameover":   "false",
+		"blueScore": blueScore,
+		"redScore":  redScore,
+		"turn":      turn,
+		"red":       strings.Join(redCards, " "),
+		"blue":      strings.Join(blueCards, " "),
+		"assassin":  assassin,
+		"civilian":  strings.Join(civCards, " "),
+		"gameover":  "false",
 	}
 	database.HSet(ctx, gameID, vals)
 

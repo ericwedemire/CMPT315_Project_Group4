@@ -74,14 +74,14 @@ func createGame(writer http.ResponseWriter, request *http.Request) {
 	assassin := words[len(words)-1]
 
 	vals := map[string]interface{}{
-		"blue:score": blueScore,
-		"red:score":  redScore,
-		"turn":       turn,
-		"red":        strings.Join(redCards, " "),
-		"blue":       strings.Join(blueCards, " "),
-		"assassin":   assassin,
-		"civilian":   strings.Join(civCards, " "),
-		"gameover":   "false",
+		"blueScore": blueScore,
+		"redScore":  redScore,
+		"turn":      turn,
+		"red":       strings.Join(redCards, " "),
+		"blue":      strings.Join(blueCards, " "),
+		"assassin":  assassin,
+		"civilian":  strings.Join(civCards, " "),
+		"gameover":  "false",
 	}
 	database.HSet(ctx, newGame.GameID, vals)
 
