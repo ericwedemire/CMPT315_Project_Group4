@@ -1,6 +1,6 @@
 # CMPT315_Project_Group4
 ##### Shea Odland, Von Castro, Eric Wedemire
-##### CMPT315
+##### CMPT315 - Web Application Development
 ##### Group Project: Codenames
 
 
