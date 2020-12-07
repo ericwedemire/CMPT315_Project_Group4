@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/rand"
 	"strconv"
 	"strings"
 
@@ -12,9 +13,13 @@ import (
 
 // databaseUpdate receives a message from the frontend WebSocket connection in
 //form of:
+//		"SKIP"
+//		"NEXTGAME"
 //		"cardType cardClicked"
-//It will use this key,value pair to update the redis database accordingly and
-//notify all users who are listening in that game
+//Mostly commonly, the third message listed third will be sent by client
+//connections, this will use the key(cardType)-value(cardClicked) pair to
+//update the redis database accordingly and notify all users who are
+//listening in that game
 func databaseUpdate(user User, message string) {
 
 	game := activeGames[user.GameID]
@@ -22,8 +27,18 @@ func databaseUpdate(user User, message string) {
 	//mutex lock
 	game.mutex.Lock()
 
+	//Skip turn button clicked
 	if message == "SKIP" {
 		skipTurn(user.GameID)
+
+		//early unlock when turn skip called
+		game.mutex.Unlock()
+		return
+	}
+
+	//Next Game button clicked
+	if message == "NEXTGAME" {
+		nextGame(user.GameID)
 
 		//early unlock when turn skip called
 		game.mutex.Unlock()
@@ -116,7 +131,61 @@ func databaseUpdate(user User, message string) {
 	log.Println("SUCCESS: card:", keyValue[0], keyValue[1], "was selected")
 }
 
+// skipTurn is called when clients send "NEXTGAME" messages through their
+//WebSocket connection, it will create a new game board and return that new
+//game information to all listeners
+func nextGame(gameID string) {
+	// generate words and place them into database object ---------------------
+
+	// draw random cards
+	words := drawCards()
+
+	// select who goes first
+	// who goes first determines how many cards a team needs to guess
+	turns := [2]string{"red", "blue"}
+	turn := turns[rand.Intn(2)]
+
+	redScore := 9
+	blueScore := 9
+
+	if turn == "blue" {
+		redScore--
+	} else {
+		blueScore--
+	}
+
+	// create strings for vals interface
+	redCards := words[:redScore]
+	blueCards := words[redScore : redScore+blueScore]
+	civCards := words[redScore+blueScore : len(words)-1]
+	assassin := words[len(words)-1]
+
+	vals := map[string]interface{}{
+		"blueScore": blueScore,
+		"redScore":  redScore,
+		"turn":      turn,
+		"red":       strings.Join(redCards, " "),
+		"blue":      strings.Join(blueCards, " "),
+		"assassin":  assassin,
+		"civilian":  strings.Join(civCards, " "),
+	}
+	database.HSet(ctx, gameID, vals)
+
+	get := database.HGetAll(ctx, gameID)
+	if err := get.Err(); err != nil {
+		if err == redis.Nil {
+			log.Println("key does not exists")
+		}
+		panic(err)
+	}
+	log.Println("SUCCESS: created new game for ID:", gameID)
+
+	notify(gameID, vals)
+}
+
 // skipTurn is called when clients send "SKIP" messages through their WebSocket
+//connection, it will send a message to all listeners that the turn has been
+//skipped.
 func skipTurn(gameID string) {
 	currentTurn := database.HGet(ctx, gameID, "turn").Val()
 	switch currentTurn {

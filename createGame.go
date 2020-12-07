@@ -47,8 +47,7 @@ func createGame(writer http.ResponseWriter, request *http.Request) {
 		encodeAndSendError(writer, request, http.StatusBadRequest, message)
 		return
 	}
-	// generate words and place them into database object -----------------------------------------------------------------
-	//generateRandomCards()
+	// generate words and place them into database object ---------------------
 
 	// draw n number or random cards
 	words := drawCards()
@@ -91,7 +90,6 @@ func createGame(writer http.ResponseWriter, request *http.Request) {
 		}
 		panic(err)
 	}
-	// generate words and place them into database object -----------------------------------------------------------------
 	log.Println("SUCCESS: created game:", newGame.GameID)
 }
 

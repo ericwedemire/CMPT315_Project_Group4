@@ -47,7 +47,7 @@ function createGame() {
 }
 
 function nextGame() {
-
+    socket.send('NEXTGAME');
 }
 
 function skipTurn() {
