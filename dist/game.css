@@ -72,6 +72,11 @@ h1 a {
   font-family: Verdana, Geneva, sans-serif;
 }
 
+.wordCard:hover {
+  border-radius: 25px;
+  background-color: #8bbb8b;
+}
+
 .btn-container {
   display: flex;
   justify-content: center;
