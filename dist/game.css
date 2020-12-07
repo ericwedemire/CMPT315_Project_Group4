@@ -1,95 +1,101 @@
 body {
-    background-color: #f1faee;
+  background-color: #f1faee;
 }
-.board{
-    display: grid;
-    grid-template-columns: repeat(5,140px);
-    grid-template-rows: repeat(5,100px);
-    justify-content: center;
-    gap: 10px;
+.board {
+  display: grid;
+  grid-template-columns: repeat(5, 140px);
+  grid-template-rows: repeat(5, 100px);
+  justify-content: center;
+  gap: 10px;
 }
 h1 {
-    color:  #264653;
-    font-family:    "Lucida Sans Unicode", "Lucida Grande", sans-serif;
-    text-transform: uppercase;
-    text-align: center;
+  color: #264653;
+  font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+  text-transform: uppercase;
+  text-align: center;
 }
 
 h1 a {
-    color:  #264653;
-    text-decoration: none;
+  color: #264653;
+  text-decoration: none;
 }
 
 .link-container {
-    display: flex;
-    justify-content: center;
-    font-family:    "Lucida Sans Unicode", "Lucida Grande", sans-serif;
-    margin-bottom: 2em;
+  display: flex;
+  justify-content: center;
+  font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+  margin-bottom: 2em;
 }
 
-.scoreboard, .player-turn {
-    font-weight: 900;
-    font-size: 18px;
-    font-family: "Arial Black", Gadget, sans-serif;
+.scoreboard,
+.player-turn {
+  font-weight: 900;
+  font-size: 18px;
+  font-family: "Arial Black", Gadget, sans-serif;
 }
 .scoreboard {
-    white-space: nowrap;
-    text-align: center;
+  white-space: nowrap;
+  text-align: center;
 }
 
-.scoreboard *{
-    display: inline;
-    justify-content: right;
+.scoreboard * {
+  display: inline;
+  justify-content: right;
 }
 
 .scoreboard > .blue-scoreboard {
-    color:  blue;
+  color: blue;
 }
 
 .scoreboard > .red-scoreboard {
-    color: red;
+  color: red;
 }
 
 .player-turn {
-    text-align: center;
-    margin-bottom: 1em;
+  text-align: center;
+  margin-bottom: 1em;
 }
 
 .wordCard {
-    display:    flex;
-    border-radius: 10px;
-    justify-content: center;
-    align-items: center;
-    height: 100px;
-    width: 100%;
-    border: 2em;
-    background-color: teal;
-    color: white;
-    font-weight: 900;
-    font-size: 16px;
-    text-transform: uppercase;
-    font-family: Verdana, Geneva, sans-serif
-
+  display: flex;
+  border-radius: 10px;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+  width: 100%;
+  border: 2em;
+  background-color: teal;
+  color: white;
+  font-weight: 900;
+  font-size: 16px;
+  text-transform: uppercase;
+  font-family: Verdana, Geneva, sans-serif;
 }
 
 .btn-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
 }
 
-#btn-player, #btn-spymaster, #btn-next-game, #btn-skip-turn {
-    margin-top: 1em;
-    background-color: white;
-    font-size: 16px;
-    padding: 7px 32px;
-    border: 3px solid;
-    text-transform: uppercase;
+#btn-player,
+#btn-spymaster,
+#btn-next-game,
+#btn-skip-turn {
+  margin-top: 1em;
+  background-color: white;
+  font-size: 16px;
+  padding: 7px 32px;
+  border: 3px solid;
+  text-transform: uppercase;
 }
 
-#btn-player:hover, #btn-spymaster:hover, #btn-next-game:hover {
-    font-weight: 900;
-    color: white;
-    background-color: rgb(14, 106, 243);
+#btn-player:hover,
+#btn-spymaster:hover,
+#btn-next-game:hover,
+#btn-skip-turn:hover {
+  font-weight: 900;
+  color: white;
+  background-color: rgb(14, 106, 243);
 }
