@@ -37,7 +37,6 @@ function nextGame() {
 }
 
 function skipTurn() {
-    // bug: scoreboard becomes undefined 
     socket.send('SKIP');
 }
 
@@ -160,8 +159,8 @@ function checkCard(event: MouseEvent) {
     let cardType = card.classList[2];
     let cardWord = card.textContent;
     let cardSelection = cardType + " " + cardWord;
-    card.classList.remove("unselected")
-    card.classList.add("selected")
+    // card.classList.remove("unselected")
+    // card.classList.add("selected")
     // Send the card selected to the backend to be marked selected
     socket.send(cardSelection);
 }
@@ -172,6 +171,9 @@ function updateView(gameData: any) {
     wordCards.forEach(function (wordCard) {
         let element = <HTMLElement>wordCard;
         if (element.innerHTML == lastSelection) {
+            // update view for everyone
+            element.classList.remove("unselected")
+            element.classList.add("selected")
             alterCardStyle(element);
             element.removeEventListener("click", checkCard);
         }
