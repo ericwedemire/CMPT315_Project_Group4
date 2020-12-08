@@ -23,7 +23,7 @@ function createGame() {
         });
 }
 
-const goBtn: HTMLInputElement | null = document.querySelector("#btn-go");
-if (goBtn) {
-    goBtn.addEventListener("click", createGame);
+const goForm: HTMLInputElement | null = document.querySelector("#form");
+if (goForm) {
+    goForm.addEventListener("submit", createGame);
 };
