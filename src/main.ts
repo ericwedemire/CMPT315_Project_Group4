@@ -143,8 +143,8 @@ function updateScoreboard(gameData: any) {
     // bug: scoreboard is undefined until a card selection event is triggered
     let redBoard = document.querySelector(".red-scoreboard");
     if (redBoard) { redBoard.innerHTML = gameData.redScore };
-    let blueBoard = document.querySelector(".red-scoreboard");
-    if (blueBoard) { blueBoard.innerHTML = gameData.redScore };
+    let blueBoard = document.querySelector(".blue-scoreboard");
+    if (blueBoard) { blueBoard.innerHTML = gameData.blueScore };
 }
 
 /* This function is written with the premise that word cards will be made up of 
