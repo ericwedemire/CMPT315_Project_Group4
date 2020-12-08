@@ -84,19 +84,22 @@ func databaseUpdate(user User, message string) {
 	case "red":
 		gameState.RedScore--
 		if gameState.RedScore == 0 {
-			gameState.GameOver = true
+			gameState.GameOver = "true"
+			pipeline.Do(ctx, "HSET", user.GameID, "gameover", "true")
 		}
 		pipeline.Do(ctx, "HSET", user.GameID, "redScore", gameState.RedScore)
 
 	case "blue":
 		gameState.BlueScore--
 		if gameState.BlueScore == 0 {
-			gameState.GameOver = true
+			gameState.GameOver = "true"
+			pipeline.Do(ctx, "HSET", user.GameID, "gameover", "true")
 		}
 		pipeline.Do(ctx, "HSET", user.GameID, "blueScore", gameState.BlueScore)
 
 	case "assassin":
-		gameState.GameOver = true
+		gameState.GameOver = "true"
+		pipeline.Do(ctx, "HSET", user.GameID, "gameover", "true")
 	}
 
 	// turn change only if card colour did not match turn colour
@@ -168,6 +171,7 @@ func nextGame(gameID string) {
 		"blue":      strings.Join(blueCards, " "),
 		"assassin":  assassin,
 		"civilian":  strings.Join(civCards, " "),
+		"gameover":  "false",
 	}
 	database.HSet(ctx, gameID, vals)
 
@@ -215,7 +219,7 @@ func skipTurn(gameID string) {
 // 	"redScore": int,
 // 	"blueScore": int,
 // 	"turn": string,
-// 	"gameOver": bool
+// 	"gameover": bool
 // }
 //
 func notify(gameID string, status interface{}) {
@@ -245,5 +249,4 @@ func alterCardState(gameID string, keyValue []string) string {
 
 	//replace cardValue with !cardValue for database insertion
 	return strings.Replace(valuesFromKey.Val(), keyValue[1]+" ", "!"+keyValue[1]+" ", 1)
-	// return strings.Replace(valuesFromKey.Val(), " "+keyValue[1]+" ", " !"+keyValue[1]+" ", 1)
 }

@@ -8,6 +8,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"math/rand"
@@ -80,10 +81,12 @@ func createGame(writer http.ResponseWriter, request *http.Request) {
 		"blue":      strings.Join(blueCards, " "),
 		"assassin":  assassin,
 		"civilian":  strings.Join(civCards, " "),
+		"gameover":  "false",
 	}
 	database.HSet(ctx, newGame.GameID, vals)
 
 	get := database.HGetAll(ctx, newGame.GameID)
+	fmt.Println(get)
 	if err := get.Err(); err != nil {
 		if err == redis.Nil {
 			log.Println("key does not exists")

@@ -13,11 +13,20 @@ socket = new WebSocket("ws://localhost:8008/games?id=" + id);
 socket.addEventListener('message', function (event) {
     let gameData = JSON.parse(event.data);
     const board: HTMLDivElement | null = document.querySelector('.board');
+    if (gameData.status) {
+        // redirect to 404 page
+        console.log(gameData, "not found")
+        // ##############################
+    }
+    
+    //joining game, assassin field only appears here
     if (gameData.assassin) {
         dealCards(gameData);
+        updateScoreboard(gameData);
         attachListeners();
     }
-    if (gameData.redScore) {
+    //server sends update after card selection
+    if (gameData.blueScore || gameData.redScore) {
         updateView(gameData);
         updateScoreboard(gameData)
     }
@@ -40,7 +49,6 @@ function createGame() {
     fetch(apiCall)
         .then(response => {
             if (response.status === 400) {
-                console.log("NAME EXISTS")
             } window.location.assign('/games/' + gameId);
         });
 }
@@ -92,6 +100,9 @@ function assignWords(cards: object[], gameData: any) {
         let wordCards = document.querySelectorAll(".board .wordCard");
         wordCards.forEach(function (wordCard) {
             let element = <HTMLElement>wordCard;
+            
+            //add hover styling
+            element.classList.add("playerView")
             if (element.classList[3] == "selected") {
                 alterCardStyle(element);
 
@@ -106,17 +117,8 @@ function assignWords(cards: object[], gameData: any) {
 
 function checkGameState(gameData: any) {
     // check if game has ended
-    if (gameData.gameOver) {
-        // remove listener on skip button
-        let skipButton = document.querySelector("#btn-skip-turn");
-        skipButton.removeEventListener("click", skipTurn);
+    if (gameData.gameover === "true") {
 
-        // remove listeners on cards
-        let wordCards = document.querySelectorAll(".board .wordCard.tile");
-        wordCards.forEach(function (wordCard) {
-            let element = <HTMLDivElement>wordCard;
-            element.removeEventListener("click", checkCard);
-        });
         // check if blue won
         if (gameData.blueScore <= 0) {
             document.querySelector(".player-turn").innerHTML = "Victory for Blue!";
@@ -131,6 +133,17 @@ function checkGameState(gameData: any) {
             let winner = document.querySelector(".player-turn").innerHTML.slice(0, -7);
             document.querySelector(".player-turn").innerHTML = "Victory for " + winner + "!";
         }
+        
+        // remove listener on skip button
+        let skipButton = document.querySelector("#btn-skip-turn");
+        skipButton.removeEventListener("click", skipTurn);
+
+        // remove listeners on cards
+        let wordCards = document.querySelectorAll(".board .wordCard.tile");
+        wordCards.forEach(function (wordCard) {
+            let element = <HTMLDivElement>wordCard;
+            element.removeEventListener("click", checkCard);
+        });
     }
 }
 
@@ -168,7 +181,6 @@ function checkCard(event: MouseEvent) {
 }
 
 function updateView(gameData: any) {
-    console.log(gameData)
     let lastSelection = gameData.lastSelection;
     let wordCards = document.querySelectorAll(".wordCard");
     wordCards.forEach(function (wordCard) {
@@ -182,38 +194,39 @@ function updateView(gameData: any) {
 }
 
 function spyMasterView() {
-    // WIP with Shea
     let cards: NodeListOf<HTMLElement> = document.querySelectorAll(".board .wordCard");
     cards.forEach(function (card) {
         let cardClasses = card.classList;
+        card.classList.remove("playerView")
         card.setAttribute("font-weight", "bold");
         if (cardClasses[0] && cardClasses[1] != "assassin") {
             if (cardClasses[2] == "blue")  {
-                card.style.backgroundColor = 'rgb(' + 66 + ',' + 138 + ',' + 245 + ')';
+                card.classList.add("spymasterBlue")
             } else if (cardClasses[2] == "red") {
-                card.style.backgroundColor = 'rgb(' + 245 + ',' + 90 + ',' + 66 + ')';
+                card.classList.add("spymasterRed")
             } else if (cardClasses[2] == "civilian") {
-                card.style.color = "black";
-                card.style.backgroundColor = 'rgb(' + 215 + ',' + 195 + ',' + 150 + ')';
+                card.classList.add("spymasterCivilian")
             } else {
-                card.style.backgroundColor = 'rgb(' + 50 + ',' + 50 + ',' + 50 + ')';
+                card.classList.add("spymasterAssassin")
             }
         }
     });
 }
 
 function playerView() {
-    // WIP with Shea
     let cards: NodeListOf<HTMLElement> = document.querySelectorAll(".board .wordCard");
     cards.forEach(function (card) {
+        card.classList.remove("spymasterBlue")
+        card.classList.remove("spymasterRed")
+        card.classList.remove("spymasterCivilian")
+        card.classList.remove("spymasterAssassin")
         let cardClasses = card.classList;
         if (cardClasses[3] == "selected") {
             alterCardStyle(card);
         }
         else {
-            // need to check for selected cards
-            card.style.backgroundColor = "teal";
-            card.style.color = "white";
+            //add hover css back
+            card.classList.add("playerView")
         }
     });
 }

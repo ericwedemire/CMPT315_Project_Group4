@@ -35,13 +35,18 @@ type GameState struct {
 	RedScore      int    `json:"redScore"`
 	BlueScore     int    `json:"blueScore"`
 	Turn          string `json:"turn"`
-	GameOver      bool   `json:"gameOver"`
+	GameOver      string `json:"gameover"`
 }
 
 // TurnState is used to pass updates to client connections everytime a word is
 //selected.
 type TurnState struct {
 	Turn string `json:"turn"`
+}
+
+// ErrorState is used to notify socket connections that a game is not found.
+type ErrorState struct {
+	Status string `json:"status"`
 }
 
 // activeGames keeps a record of all active game sessions
