@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"math/rand"
 	"strconv"
@@ -49,7 +48,6 @@ func databaseUpdate(user User, message string) {
 
 	//split message into [key, value]
 	keyValue := strings.Split(message, " ")
-	fmt.Println(len(keyValue) - 1)
 	if len(keyValue)-1 != 1 {
 		keyValue[1] = keyValue[1] + " " + keyValue[len(keyValue)-1]
 	}
@@ -59,7 +57,6 @@ func databaseUpdate(user User, message string) {
 	if alterResult == "" {
 		return
 	}
-	fmt.Printf(alterResult)
 
 	turn := database.HGet(ctx, user.GameID, "turn").Val()
 
