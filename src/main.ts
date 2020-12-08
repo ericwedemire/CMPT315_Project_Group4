@@ -195,10 +195,12 @@ function updateView(gameData: any) {
 
 function spyMasterView() {
     let cards: NodeListOf<HTMLElement> = document.querySelectorAll(".board .wordCard");
-    cards.forEach(function (card) {
+    cards.forEach(function (card: HTMLElement) {
+
         let cardClasses = card.classList;
-        card.classList.remove("playerView")
-        card.setAttribute("font-weight", "bold");
+        card.classList.remove("playerView");
+        card.removeEventListener("click", checkCard);
+
         if (cardClasses[0] && cardClasses[1] != "assassin") {
             if (cardClasses[2] == "blue")  {
                 card.classList.add("spymasterBlue")
@@ -216,6 +218,7 @@ function spyMasterView() {
 function playerView() {
     let cards: NodeListOf<HTMLElement> = document.querySelectorAll(".board .wordCard");
     cards.forEach(function (card) {
+        card.addEventListener("click", checkCard)
         card.classList.remove("spymasterBlue")
         card.classList.remove("spymasterRed")
         card.classList.remove("spymasterCivilian")
