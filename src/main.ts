@@ -15,7 +15,6 @@ socket.addEventListener('message', function (event) {
     const board: HTMLDivElement | null = document.querySelector('.board');
     if (gameData.status) {
         // redirect to 404 page
-        console.log(gameData, "not found") 
         window.location.assign("/notfound")
     }   
     //joining game, assassin field only appears here
