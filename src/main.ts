@@ -172,7 +172,7 @@ function checkCard(event: MouseEvent) {
 
     // Format card to "cardType cardWord" so the API can understand and respond appropriately
     let cardType = card.classList[2];
-    let cardWord = card.innerHTML;
+    let cardWord = card.textContent;
     let cardSelection = cardType + " " + cardWord;
     card.classList.remove("unselected")
     card.classList.add("selected")
@@ -278,17 +278,20 @@ function createBoardTemplate(boardTemplate: HTMLScriptElement): string {
 function alterCardStyle(element: HTMLElement) {
     switch (element.classList[2]) {
         case "blue":
-            element.style.backgroundColor = 'rgb(' + 66 + ',' + 138 + ',' + 245 + ')';
+            element.classList.add("spymasterBlue")
+            element.classList.remove("playerView")
             break;
         case "red":
-            element.style.backgroundColor = 'rgb(' + 245 + ',' + 90 + ',' + 66 + ')';
+            element.classList.add("spymasterRed")
+            element.classList.remove("playerView")
             break;
         case "assassin":
-            element.style.backgroundColor = 'rgb(' + 50 + ',' + 50 + ',' + 50 + ')';
+            element.classList.add("spymasterAssassin")
+            element.classList.remove("playerView")
             break;
         case "civilian":
-            element.style.backgroundColor = 'rgb(' + 215 + ',' + 195 + ',' + 150 + ')';
-            element.style.color = "black";
+            element.classList.add("spymasterCivilian")
+            element.classList.remove("playerView")
             break;
         default:
             return;

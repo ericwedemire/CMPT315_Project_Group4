@@ -49,6 +49,10 @@ func databaseUpdate(user User, message string) {
 
 	//split message into [key, value]
 	keyValue := strings.Split(message, " ")
+	fmt.Println(len(keyValue) - 1)
+	if len(keyValue)-1 != 1 {
+		keyValue[1] = keyValue[1] + " " + keyValue[len(keyValue)-1]
+	}
 
 	//alter cardValue in database
 	alterResult := alterCardState(user.GameID, keyValue)
