@@ -51,6 +51,10 @@ func main() {
 		Queries("id", "{gameID:[a-zA-Z0-9]+}").
 		Methods(http.MethodGet)
 
+	router.Path("/notfound").Methods("GET").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./dist/notfound.html")
+	})
+
 	router.PathPrefix("/").Handler(http.FileServer(http.Dir("./dist/")))
 	//-------------------------------------------------------------------------
 
