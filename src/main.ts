@@ -15,10 +15,9 @@ socket.addEventListener('message', function (event) {
     const board: HTMLDivElement | null = document.querySelector('.board');
     if (gameData.status) {
         // redirect to 404 page
-        console.log(gameData, "not found")
-        // ##############################
-    }
-    
+        console.log(gameData, "not found") 
+        window.location.assign("/notfound")
+    }   
     //joining game, assassin field only appears here
     if (gameData.assassin) {
         dealCards(gameData);
@@ -33,25 +32,6 @@ socket.addEventListener('message', function (event) {
     assignTurn(gameData);
     checkGameState(gameData);
 });
-
-function createGame() {
-    let idInput = <HTMLInputElement>document.querySelector("#game-id");
-    let gameId = idInput.value;
-    const createGameBody: string = gameId;
-    const jsonBody: string = JSON.stringify({ "gameID": createGameBody });
-    const myInit: RequestInit = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', },
-        body: jsonBody,
-    };
-
-    const apiCall = new Request("http://localhost:8008/api/v1/games", myInit);
-    fetch(apiCall)
-        .then(response => {
-            if (response.status === 400) {
-            } window.location.assign('/games/' + gameId);
-        });
-}
 
 function nextGame() {
     socket.send('NEXTGAME');
@@ -100,7 +80,7 @@ function assignWords(cards: object[], gameData: any) {
         let wordCards = document.querySelectorAll(".board .wordCard");
         wordCards.forEach(function (wordCard) {
             let element = <HTMLElement>wordCard;
-            
+                        
             //add hover styling
             element.classList.add("playerView")
             if (element.classList[3] == "selected") {
@@ -118,26 +98,31 @@ function assignWords(cards: object[], gameData: any) {
 function checkGameState(gameData: any) {
     // check if game has ended
     if (gameData.gameover === "true") {
-
+        let scoreboard = document.querySelector(".player-turn");
         // check if blue won
         if (gameData.blueScore <= 0) {
-            document.querySelector(".player-turn").innerHTML = "Victory for Blue!";
+            if (scoreboard) {
+                scoreboard.innerHTML = "Victory for Blue!";
+            }
         }
         // check if red won
         else if (gameData.redScore <= 0) {
-            document.querySelector(".player-turn").innerHTML = "Victory for Red!";
+            if (scoreboard) {
+                scoreboard.innerHTML = "Victory for Red!";
+            }
         }
-
         // assassin probably clicked
         else {
-            let winner = document.querySelector(".player-turn").innerHTML.slice(0, -7);
-            document.querySelector(".player-turn").innerHTML = "Victory for " + winner + "!";
+            if (scoreboard) {
+                let winner = scoreboard.innerHTML.slice(0, -7);
+                scoreboard.innerHTML = "Victory for " + winner;
+            }
         }
-        
         // remove listener on skip button
         let skipButton = document.querySelector("#btn-skip-turn");
-        skipButton.removeEventListener("click", skipTurn);
-
+        if (skipButton) {
+            skipButton.removeEventListener("click", skipTurn);
+        }
         // remove listeners on cards
         let wordCards = document.querySelectorAll(".board .wordCard.tile");
         wordCards.forEach(function (wordCard) {
@@ -157,8 +142,10 @@ function assignTurn(gameData: any) {
 
 function updateScoreboard(gameData: any) {
     // bug: scoreboard is undefined until a card selection event is triggered
-    document.querySelector(".red-scoreboard").innerHTML = gameData.redScore;
-    document.querySelector(".blue-scoreboard").innerHTML = gameData.blueScore;
+    let redBoard = document.querySelector(".red-scoreboard");
+    if (redBoard) { redBoard.innerHTML = gameData.redScore };
+    let blueBoard = document.querySelector(".red-scoreboard");
+    if (blueBoard) { blueBoard.innerHTML = gameData.redScore };
 }
 
 /* This function is written with the premise that word cards will be made up of 
@@ -297,10 +284,6 @@ function alterCardStyle(element: HTMLElement) {
 
 
 function attachListeners() {
-    const goBtn: HTMLInputElement | null = document.querySelector("#btn-go");
-    if (goBtn) {
-        goBtn.addEventListener("click", createGame);
-    };
     const spyBtn: HTMLInputElement | null = document.querySelector("#btn-spymaster");
     if (spyBtn) {
         spyBtn.addEventListener("click", spyMasterView);
